@@ -764,6 +764,11 @@ class Component extends DCLogic {
       if (this.state.serverMode) {
         this.apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ password: raw }) })
           .then(j => {
+            if (j.otp) {
+              this.setState({ mode: 'otp' });
+              this.push({ text: 'a 6-digit code was sent to your email. it expires in 5 minutes.', kind: 'accent' });
+              return;
+            }
             try { localStorage.setItem('pf_token', j.token); } catch (e) {}
             this.setState({ token: j.token });
             this.push({ text: 'access granted. welcome, root.', kind: 'accent' });
@@ -776,6 +781,19 @@ class Component extends DCLogic {
       } else {
         this.push({ text: 'access denied.', kind: 'err' });
       }
+      return;
+    }
+    if (s.mode === 'otp') {
+      this.push({ text: 'code: ' + raw.trim(), kind: 'dim' });
+      this.setState({ mode: 'normal' });
+      this.apiFetch('/auth/otp', { method: 'POST', body: JSON.stringify({ code: raw.trim() }) })
+        .then(j => {
+          try { localStorage.setItem('pf_token', j.token); } catch (e) {}
+          this.setState({ token: j.token });
+          this.push({ text: 'access granted. welcome, root.', kind: 'accent' });
+          this.openApp('admin');
+        })
+        .catch(() => this.push({ text: 'invalid or expired code — run sudo admin again.', kind: 'err' }));
       return;
     }
     const prompt = s.mode === 'chat' ? 'ai> ' : 'guest@tanjim:~$ ';
@@ -1227,7 +1245,7 @@ class Component extends DCLogic {
       termChips: ['help', 'ls', 'cd projects', 'cd skills', 'ai', 'clear'].map(l => ({ label: l, click: () => this.runCommand(l) })),
       termLines: s.termLines.map(l => ({ text: l.text, color: colorFor[l.kind] || 'var(--text)', weight: l.kind === 'cmd' ? '600' : '400' })),
       termInput: s.termInput, termInputType: s.mode === 'password' ? 'password' : 'text',
-      promptLabel: s.mode === 'password' ? 'password:' : (s.mode === 'chat' ? 'ai>' : 'guest@tanjim:~$'),
+      promptLabel: s.mode === 'password' ? 'password:' : (s.mode === 'otp' ? 'code:' : (s.mode === 'chat' ? 'ai>' : 'guest@tanjim:~$')),
       onTermChange: e => this.setState({ termInput: e.target.value }),
       onTermKey: this.onTermKey, focusTerm: this.focusTerm,
       finderItems: this.sections.map(x => ({ label: x.toUpperCase(), click: () => this.setState({ section: x, lastSection: x }) })),

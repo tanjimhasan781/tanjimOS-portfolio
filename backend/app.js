@@ -79,9 +79,58 @@ app.post('/api/content/reset', auth, wrap(async (req, res) => {
   const db = req.db; db.content = seed; await save(db); res.json({ content: db.content });
 }));
 
+const loginAttempts = new Map();
+function loginLimited(ip) {
+  const now = Date.now();
+  const arr = (loginAttempts.get(ip) || []).filter(t => now - t < 15 * 60e3);
+  arr.push(now);
+  loginAttempts.set(ip, arr);
+  return arr.length > 5;
+}
+
+async function sendOtpEmail(code) {
+  const r = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + process.env.RESEND_API_KEY },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM || 'tanjimOS <onboarding@resend.dev>',
+      to: [process.env.NOTIFY_EMAIL || 'tanjimulhasan781@gmail.com'],
+      subject: '[portfolio] admin login code: ' + code,
+      text: 'Your tanjimOS admin login code is: ' + code + '\n\nIt expires in 5 minutes. If you did not try to log in, someone knows your password — change it.'
+    })
+  });
+  if (!r.ok) throw new Error('otp email failed: ' + r.status);
+}
+
 app.post('/api/auth/login', wrap(async (req, res) => {
+  const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '?').split(',')[0];
+  if (loginLimited(ip)) return res.status(429).json({ error: 'too many attempts — wait 15 minutes' });
   const db = await load();
   if (hash(String(req.body.password || ''), db.salt) !== db.passHash) return res.status(401).json({ error: 'wrong password' });
+  if (process.env.RESEND_API_KEY) {
+    const code = String(crypto.randomInt(100000, 1000000));
+    db.otp = { h: hash(code, db.salt), exp: Date.now() + 5 * 60e3, tries: 0 };
+    await save(db);
+    await sendOtpEmail(code);
+    return res.json({ otp: true });
+  }
+  // no email service configured — fall back to password-only so you can't lock yourself out
+  const token = crypto.randomBytes(32).toString('hex');
+  db.tokens[token] = Date.now() + 7 * 24 * 3600 * 1000;
+  Object.keys(db.tokens).forEach(k => { if (db.tokens[k] < Date.now()) delete db.tokens[k]; });
+  await save(db);
+  res.json({ token });
+}));
+
+app.post('/api/auth/otp', wrap(async (req, res) => {
+  const db = await load();
+  if (!db.otp || db.otp.exp < Date.now() || db.otp.tries >= 5) { delete db.otp; await save(db); return res.status(401).json({ error: 'code expired — log in again' }); }
+  if (hash(String(req.body.code || '').trim(), db.salt) !== db.otp.h) {
+    db.otp.tries++;
+    await save(db);
+    return res.status(401).json({ error: 'wrong code' });
+  }
+  delete db.otp;
   const token = crypto.randomBytes(32).toString('hex');
   db.tokens[token] = Date.now() + 7 * 24 * 3600 * 1000;
   Object.keys(db.tokens).forEach(k => { if (db.tokens[k] < Date.now()) delete db.tokens[k]; });
