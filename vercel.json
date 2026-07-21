@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/Portfolio.dc.html" },
+    { "source": "/api/:path*", "destination": "/api/index" }
+  ]
+}
