@@ -8,7 +8,7 @@ One Express app (`backend/app.js`) that runs two ways:
 
 | Var | Required | Purpose |
 |---|---|---|
-| SUPABASE_URL | on Vercel | your project URL, e.g. https://xyz.supabase.co |
+| SUPABASE_URL | on Vercel | project URL, e.g. https://xyz.supabase.co |
 | SUPABASE_SERVICE_KEY | on Vercel | service_role key (server-only secret) |
 | ADMIN_PASSWORD | first boot | seeds the admin password (default `letmein`) |
 | GROQ_API_KEY | recommended | terminal AI for all visitors + contact-form spam gating |
