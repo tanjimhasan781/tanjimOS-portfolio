@@ -237,7 +237,9 @@ a:hover { color: #fff; }
         <div style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">cv.pdf — preview</div>
         <a href="{{ cvSrc }}" download="Tanjimul_Hasan_CV.pdf" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac)">download ↓</a>
       </div>
-      <iframe src="{{ cvSrc }}" title="CV" style="flex:1;border:none;background:#3a3a3e"></iframe>
+      <sc-if value="{{ cvOpen }}" hint-placeholder-val="{{ false }}">
+        <iframe src="{{ cvSrc }}" title="CV" style="flex:1;border:none;background:#3a3a3e"></iframe>
+      </sc-if>
     </div>
   </div>
 
@@ -1299,7 +1301,7 @@ class Component extends DCLogic {
       adminText: draftIsText ? draft : '',
       onAdminText: e => this.setState({ adminDraft: e.target.value }),
       adminAddItem: () => this.uiSet(d => { const proto = d[0] || {}; const it = {}; Object.keys(proto).forEach(k => { it[k] = Array.isArray(proto[k]) ? [] : ''; }); d.push(it); return d; }),
-      cvSrc: s.cvSrc, cvMsg: s.cvMsg, cvLabel: s.cvSrc === 'cv.pdf' ? 'default (cv.pdf)' : 'custom upload',
+      cvSrc: s.cvSrc, cvMsg: s.cvMsg, cvOpen: s.openApps.includes('cv'), cvLabel: s.cvSrc === 'cv.pdf' ? 'default (cv.pdf)' : 'custom upload',
       onCvFile: this.onCvFile, cvReset: this.cvReset,
       avatarSrc: s.avatarSrc, avatarMsg: s.avatarMsg, avatarReady: true, heroImgRef: this.heroImgRef, adminImgRef: this.adminImgRef,
       onAvatarFile: this.onAvatarFile, avatarReset: this.avatarReset,
