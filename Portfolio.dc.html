@@ -38,7 +38,7 @@ a:hover { color: #fff; }
   <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 70% 40%, transparent 40%, rgba(0,0,0,.55) 100%)"></div>
 
   <!-- HERO -->
-  <div data-screen-label="Home" style="position:absolute;right:7vw;top:50%;transform:translateY(-50%);max-width:600px;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:18px;z-index:5;transition:opacity .5s ease, filter .5s ease;opacity: {{ heroOp }}; filter: {{ heroBlur }}">
+  <div data-screen-label="Home" style="position:absolute;right: {{ heroRight }};left: {{ heroLeft }};top:50%;transform:translateY(-50%);max-width:600px;margin:0 auto;text-align: {{ heroAlign }};display:flex;flex-direction:column;align-items: {{ heroItems }};gap:18px;z-index:5;transition:opacity .5s ease, filter .5s ease;opacity: {{ heroOp }}; filter: {{ heroBlur }}">
     <div style="width:118px;height:118px;border-radius:50%;padding:4px;border:2px solid var(--ac);box-shadow:0 0 30px color-mix(in oklab, var(--ac) 40%, transparent);animation:floaty 5s ease-in-out infinite">
       <sc-if value="{{ avatarReady }}" hint-placeholder-val="{{ false }}">
         <img ref="{{ heroImgRef }}" alt="Tanjimul Hasan" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center top; display: block; position: static">
@@ -51,24 +51,24 @@ a:hover { color: #fff; }
     <div style="height:8px;width:280px;border:1px solid var(--border);border-radius:2px;overflow:hidden;background:var(--panel)">
       <div style="height:100%;width:76%;background:linear-gradient(90deg, var(--ac2), var(--ac));box-shadow:0 0 12px var(--ac)"></div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content: {{ heroJustify }}">
       <sc-for list="{{ socials }}" as="s" hint-placeholder-count="5">
         <a href="{{ s.url }}" target="_blank" rel="noopener" style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:1px;color:var(--ac);border:1px solid var(--border);background:var(--panel);padding:9px 12px;border-radius:4px;transition:all .2s ease" style-hover="background:var(--ac); color:var(--bg); transform:translateY(-3px); box-shadow:0 6px 16px color-mix(in oklab, var(--ac) 35%, transparent)">{{ s.label }}</a>
       </sc-for>
     </div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dim);display:flex;align-items:center;gap:8px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dim);display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content: {{ heroJustify }}">
       <span style="color:var(--ac)">▸</span> open the terminal in the dock and type <span style="color:var(--ac);border:1px solid var(--border);padding:2px 7px;border-radius:4px;background:var(--panel)">help</span>
       <span style="display:inline-block;width:8px;height:15px;background:var(--ac);animation:blink 1.1s step-end infinite"></span>
     </div>
   </div>
 
   <!-- DOCK -->
-  <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:1500;display:flex;flex-direction:column;gap:9px;padding:11px;border-radius:20px;border:1px solid var(--border);background:color-mix(in oklab, var(--panel) 75%, transparent);backdrop-filter:blur(14px);box-shadow:0 16px 40px rgba(0,0,0,.5)">
+  <div style="position:absolute;left: {{ dockLeft }};top: {{ dockTop }};bottom: {{ dockBottom }};transform: {{ dockTf }};z-index:1500;display:flex;flex-direction: {{ dockDir }};gap:9px;padding:11px;border-radius:20px;border:1px solid var(--border);background:color-mix(in oklab, var(--panel) 75%, transparent);backdrop-filter:blur(14px);box-shadow:0 16px 40px rgba(0,0,0,.5)">
     <sc-for list="{{ dockItems }}" as="d" hint-placeholder-count="6">
       <div style="position:relative">
-        <button onClick="{{ d.click }}" onMouseEnter="{{ d.enter }}" onMouseLeave="{{ dockLeave }}" title="{{ d.label }}" style="width:52px;height:52px;border-radius:14px;border:1px solid var(--border);background:linear-gradient(140deg, color-mix(in oklab, var(--panel2) 85%, var(--ac)), var(--panel));color:var(--ac);font-family:'Monocraft','Press Start 2P',monospace;font-size:15px;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease;display:flex;align-items:center;justify-content:center" style-hover="transform:scale(1.16) translateX(5px); box-shadow:0 8px 20px color-mix(in oklab, var(--ac) 30%, transparent)">{{ d.glyph }}</button>
+        <button onClick="{{ d.click }}" onMouseEnter="{{ d.enter }}" onMouseLeave="{{ dockLeave }}" title="{{ d.label }}" style="width: {{ dockBtnSize }};height: {{ dockBtnSize }};border-radius:14px;border:1px solid var(--border);background:linear-gradient(140deg, color-mix(in oklab, var(--panel2) 85%, var(--ac)), var(--panel));color:var(--ac);font-family:'Monocraft','Press Start 2P',monospace;font-size:15px;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease;display:flex;align-items:center;justify-content:center" style-hover="transform:scale(1.16) translateX(5px); box-shadow:0 8px 20px color-mix(in oklab, var(--ac) 30%, transparent)">{{ d.glyph }}</button>
         <sc-if value="{{ d.open }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:var(--ac);box-shadow:0 0 6px var(--ac)"></div>
+          <div style="position:absolute;left: {{ dotLeft }};top: {{ dotTop }};bottom: {{ dotBottom }};transform: {{ dotTf }};width:4px;height:4px;border-radius:50%;background:var(--ac);box-shadow:0 0 6px var(--ac)"></div>
         </sc-if>
         <sc-if value="{{ d.hovered }}" hint-placeholder-val="{{ false }}">
           <div style="position:absolute;left:64px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:1px;color:var(--text);background:var(--panel2);border:1px solid var(--border);padding:7px 10px;border-radius:6px;animation:popin .18s ease">{{ d.label }}</div>
@@ -78,7 +78,7 @@ a:hover { color: #fff; }
   </div>
 
   <!-- TERMINAL WINDOW -->
-  <div onClick="{{ w.terminal.wrapClick }}" style="position:absolute;left:calc(50% + 45px);top:50%;width:760px;height:480px;margin-left:-380px;margin-top:-240px;border-radius:12px;display:flex;flex-direction:column;background:color-mix(in oklab, var(--panel) 92%, black);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.terminal.tf }}; opacity: {{ w.terminal.op }}; z-index: {{ w.terminal.z }}; pointer-events: {{ w.terminal.pe }}; cursor: {{ w.terminal.cursor }}">
+  <div onClick="{{ w.terminal.wrapClick }}" style="position:absolute;left: {{ w.terminal.left }};top:50%;width: {{ w.terminal.w }};height: {{ w.terminal.h }};margin-left: {{ w.terminal.ml }};margin-top: {{ w.terminal.mt }};border-radius: {{ w.terminal.br }};display:flex;flex-direction:column;background:color-mix(in oklab, var(--panel) 92%, black);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.terminal.tf }}; opacity: {{ w.terminal.op }}; z-index: {{ w.terminal.z }}; pointer-events: {{ w.terminal.pe }}; cursor: {{ w.terminal.cursor }}">
     <div style="pointer-events: {{ w.terminal.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
       <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
         <button onClick="{{ w.terminal.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
@@ -93,14 +93,21 @@ a:hover { color: #fff; }
         </sc-for>
         <div style="display:flex;gap:8px;align-items:baseline">
           <span style="color:var(--ac);font-weight:700;flex:none">{{ promptLabel }}</span>
-          <input ref="{{ termInputRef }}" value="{{ termInput }}" onChange="{{ onTermChange }}" onKeyDown="{{ onTermKey }}" type="{{ termInputType }}" autocomplete="off" spellcheck="false" style="flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;caret-color:var(--ac)">
+          <input ref="{{ termInputRef }}" value="{{ termInput }}" onChange="{{ onTermChange }}" onKeyDown="{{ onTermKey }}" type="{{ termInputType }}" autocomplete="off" spellcheck="false" style="flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size: {{ termFs }};caret-color:var(--ac)">
         </div>
       </div>
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;display:flex;gap:8px;overflow-x:auto;padding:10px 12px;border-top:1px solid var(--border)">
+          <sc-for list="{{ termChips }}" as="ch" hint-placeholder-count="4">
+            <button onClick="{{ ch.click }}" style="flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac);background:var(--panel2);border:1px solid var(--border);padding:8px 14px;border-radius:15px;cursor:pointer">{{ ch.label }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
     </div>
   </div>
 
   <!-- FINDER WINDOW -->
-  <div onClick="{{ w.finder.wrapClick }}" style="position:absolute;left:calc(50% + 45px);top:50%;width:640px;height:440px;margin-left:-320px;margin-top:-220px;border-radius:12px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.finder.tf }}; opacity: {{ w.finder.op }}; z-index: {{ w.finder.z }}; pointer-events: {{ w.finder.pe }}; cursor: {{ w.finder.cursor }}">
+  <div onClick="{{ w.finder.wrapClick }}" style="position:absolute;left: {{ w.finder.left }};top:50%;width: {{ w.finder.w }};height: {{ w.finder.h }};margin-left: {{ w.finder.ml }};margin-top: {{ w.finder.mt }};border-radius: {{ w.finder.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.finder.tf }}; opacity: {{ w.finder.op }}; z-index: {{ w.finder.z }}; pointer-events: {{ w.finder.pe }}; cursor: {{ w.finder.cursor }}">
     <div style="pointer-events: {{ w.finder.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
       <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
         <button onClick="{{ w.finder.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
@@ -109,7 +116,7 @@ a:hover { color: #fff; }
         <div style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">sections — ~/portfolio</div>
         <div style="width:60px"></div>
       </div>
-      <div style="flex:1;min-height:0;overflow-y:auto;padding:22px;display:grid;grid-template-columns:repeat(4, 1fr);gap:16px;align-content:start">
+      <div style="flex:1;min-height:0;overflow-y:auto;padding:22px;display:grid;grid-template-columns:repeat(auto-fill, minmax(96px, 1fr));gap:16px;align-content:start">
         <sc-for list="{{ finderItems }}" as="f" hint-placeholder-count="7">
           <button onClick="{{ f.click }}" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 6px;border-radius:10px;border:1px solid transparent;background:transparent;cursor:pointer;transition:all .2s ease" style-hover="background:var(--panel2); border-color:var(--border)">
             <div style="position:relative;width:52px;height:40px">
@@ -131,7 +138,7 @@ a:hover { color: #fff; }
   </div>
 
   <!-- MAIL WINDOW -->
-  <div onClick="{{ w.mail.wrapClick }}" style="position:absolute;left:calc(50% + 45px);top:50%;width:520px;height:560px;margin-left:-260px;margin-top:-280px;border-radius:12px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.mail.tf }}; opacity: {{ w.mail.op }}; z-index: {{ w.mail.z }}; pointer-events: {{ w.mail.pe }}; cursor: {{ w.mail.cursor }}">
+  <div onClick="{{ w.mail.wrapClick }}" style="position:absolute;left: {{ w.mail.left }};top:50%;width: {{ w.mail.w }};height: {{ w.mail.h }};margin-left: {{ w.mail.ml }};margin-top: {{ w.mail.mt }};border-radius: {{ w.mail.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.mail.tf }}; opacity: {{ w.mail.op }}; z-index: {{ w.mail.z }}; pointer-events: {{ w.mail.pe }}; cursor: {{ w.mail.cursor }}">
     <div style="pointer-events: {{ w.mail.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
       <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
         <button onClick="{{ w.mail.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
@@ -176,7 +183,7 @@ a:hover { color: #fff; }
   </div>
 
   <!-- SETTINGS WINDOW -->
-  <div onClick="{{ w.settings.wrapClick }}" style="position:absolute;left:calc(50% + 45px);top:50%;width:480px;height:580px;margin-left:-240px;margin-top:-290px;border-radius:12px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.settings.tf }}; opacity: {{ w.settings.op }}; z-index: {{ w.settings.z }}; pointer-events: {{ w.settings.pe }}; cursor: {{ w.settings.cursor }}">
+  <div onClick="{{ w.settings.wrapClick }}" style="position:absolute;left: {{ w.settings.left }};top:50%;width: {{ w.settings.w }};height: {{ w.settings.h }};margin-left: {{ w.settings.ml }};margin-top: {{ w.settings.mt }};border-radius: {{ w.settings.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.settings.tf }}; opacity: {{ w.settings.op }}; z-index: {{ w.settings.z }}; pointer-events: {{ w.settings.pe }}; cursor: {{ w.settings.cursor }}">
     <div style="pointer-events: {{ w.settings.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
       <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
         <button onClick="{{ w.settings.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
@@ -221,7 +228,7 @@ a:hover { color: #fff; }
   </div>
 
   <!-- CV WINDOW -->
-  <div onClick="{{ w.cv.wrapClick }}" style="position:absolute;left:calc(50% + 45px);top:50%;width:720px;height:620px;margin-left:-360px;margin-top:-310px;border-radius:12px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.cv.tf }}; opacity: {{ w.cv.op }}; z-index: {{ w.cv.z }}; pointer-events: {{ w.cv.pe }}; cursor: {{ w.cv.cursor }}">
+  <div onClick="{{ w.cv.wrapClick }}" style="position:absolute;left: {{ w.cv.left }};top:50%;width: {{ w.cv.w }};height: {{ w.cv.h }};margin-left: {{ w.cv.ml }};margin-top: {{ w.cv.mt }};border-radius: {{ w.cv.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.cv.tf }}; opacity: {{ w.cv.op }}; z-index: {{ w.cv.z }}; pointer-events: {{ w.cv.pe }}; cursor: {{ w.cv.cursor }}">
     <div style="pointer-events: {{ w.cv.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
       <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
         <button onClick="{{ w.cv.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
@@ -235,7 +242,7 @@ a:hover { color: #fff; }
   </div>
 
   <!-- MUSIC WINDOW -->
-  <div onClick="{{ w.music.wrapClick }}" style="position:absolute;left:calc(50% + 45px);top:50%;width:340px;height:200px;margin-left:-170px;margin-top:-100px;border-radius:12px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.music.tf }}; opacity: {{ w.music.op }}; z-index: {{ w.music.z }}; pointer-events: {{ w.music.pe }}; cursor: {{ w.music.cursor }}">
+  <div onClick="{{ w.music.wrapClick }}" style="position:absolute;left: {{ w.music.left }};top:50%;width: {{ w.music.w }};height: {{ w.music.h }};margin-left: {{ w.music.ml }};margin-top: {{ w.music.mt }};border-radius: {{ w.music.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.music.tf }}; opacity: {{ w.music.op }}; z-index: {{ w.music.z }}; pointer-events: {{ w.music.pe }}; cursor: {{ w.music.cursor }}">
     <div style="pointer-events: {{ w.music.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
       <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
         <button onClick="{{ w.music.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
@@ -261,7 +268,7 @@ a:hover { color: #fff; }
   </div>
 
   <!-- ADMIN WINDOW -->
-  <div onClick="{{ w.admin.wrapClick }}" style="position:absolute;left:calc(50% + 45px);top:50%;width:780px;height:580px;margin-left:-390px;margin-top:-290px;border-radius:12px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.admin.tf }}; opacity: {{ w.admin.op }}; z-index: {{ w.admin.z }}; pointer-events: {{ w.admin.pe }}; cursor: {{ w.admin.cursor }}">
+  <div onClick="{{ w.admin.wrapClick }}" style="position:absolute;left: {{ w.admin.left }};top:50%;width: {{ w.admin.w }};height: {{ w.admin.h }};margin-left: {{ w.admin.ml }};margin-top: {{ w.admin.mt }};border-radius: {{ w.admin.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.admin.tf }}; opacity: {{ w.admin.op }}; z-index: {{ w.admin.z }}; pointer-events: {{ w.admin.pe }}; cursor: {{ w.admin.cursor }}">
     <div style="pointer-events: {{ w.admin.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
       <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
         <button onClick="{{ w.admin.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
@@ -277,7 +284,7 @@ a:hover { color: #fff; }
       </div>
       <sc-if value="{{ adminOnContent }}" hint-placeholder-val="{{ true }}">
         <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:16px">
-          <div style="display:flex;gap:10px;align-items:center">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
             <select value="{{ adminSection }}" onChange="{{ onAdminSection }}" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;outline:none">
               <option value="about">about</option>
               <option value="tagline">tagline</option>
@@ -401,17 +408,17 @@ a:hover { color: #fff; }
 
   <!-- SECTION OVERLAY -->
   <div data-screen-label="Section overlay" style="position:fixed;inset:0;z-index:900;background:color-mix(in oklab, var(--bg) 96%, black);transition:transform .6s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column;transform: translateY({{ sectionTY }})">
-    <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:20px 6vw 20px max(6vw, 120px);border-bottom:1px solid var(--border)">
+    <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:20px 6vw 20px {{ secPadL }};border-bottom:1px solid var(--border)">
       <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:16px;letter-spacing:2px;color:var(--ac)">~/{{ sectionName }}</div>
       <div style="display:flex;align-items:center;gap:14px">
         <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">esc to exit</div>
         <button onClick="{{ closeSection }}" style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-size:15px;cursor:pointer;transition:all .2s ease" style-hover="border-color:#ff5f57; color:#ff5f57">✕</button>
       </div>
     </div>
-    <div style="flex:1;min-height:0;overflow-y:auto;padding:44px 6vw 80px max(6vw, 120px)">
+    <div style="flex:1;min-height:0;overflow-y:auto;padding:44px 6vw {{ secPadB }} {{ secPadL }}">
       <div style="max-width:1000px;margin:0 auto">
         <sc-if value="{{ secAbout }}" hint-placeholder-val="{{ false }}">
-          <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:32px;align-items:start">
+          <div style="display:grid;grid-template-columns: {{ aboutCols }};gap:32px;align-items:start">
             <p style="margin:0;font-size:18px;line-height:1.8;color:var(--text);text-wrap:pretty">{{ c.about }}</p>
             <div style="border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:14px">
               <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:2px;color:var(--ac)">PLAYER STATS</div>
@@ -682,23 +689,29 @@ class Component extends DCLogic {
   winVals() {
     const sizes = { terminal: [760, 480], finder: [640, 440], mail: [520, 560], settings: [480, 580], cv: [720, 620], music: [340, 200], admin: [780, 580] };
     const vw = window.innerWidth, vh = window.innerHeight;
+    const mob = vw < 768;
     const { openApps, activeApp, zoomed } = this.state;
     const staged = openApps.filter(a => a !== activeApp);
     const out = {};
     Object.keys(sizes).forEach(id => {
       const [W, H] = sizes[id];
       const isOpen = openApps.includes(id);
-      const base = {
+      const geom = mob
+        ? { left: '50%', w: vw + 'px', h: (vh - 88) + 'px', ml: (-vw / 2) + 'px', mt: (-vh / 2) + 'px', br: '0' }
+        : { left: 'calc(50% + 45px)', w: W + 'px', h: H + 'px', ml: (-W / 2) + 'px', mt: (-H / 2) + 'px', br: '12px' };
+      const base = Object.assign({
         close: e => { e && e.stopPropagation(); this.closeApp(id); },
         min: e => { e && e.stopPropagation(); this.minApp(id); },
         zoomBtn: e => { e && e.stopPropagation(); this.zoomApp(id); }
-      };
+      }, geom);
       if (!isOpen) {
         out[id] = Object.assign(base, { tf: 'translateY(70px) scale(.7)', op: 0, z: 10, pe: 'none', innerPe: 'none', cursor: 'default', wrapClick: null });
       } else if (id === activeApp) {
         let s = 1;
-        if (zoomed[id]) s = Math.min((vh - 70) / H, (vw - 300) / W);
+        if (!mob && zoomed[id]) s = Math.min((vh - 70) / H, (vw - 300) / W);
         out[id] = Object.assign(base, { tf: 'translate(0px, 0px) scale(' + s.toFixed(3) + ')', op: 1, z: 500, pe: 'auto', innerPe: 'auto', cursor: 'default', wrapClick: null });
+      } else if (mob) {
+        out[id] = Object.assign(base, { tf: 'translateY(60px) scale(.96)', op: 0, z: 50, pe: 'none', innerPe: 'none', cursor: 'default', wrapClick: null });
       } else {
         const i = staged.indexOf(id);
         const sc = 110 / H;
@@ -1117,6 +1130,7 @@ class Component extends DCLogic {
     const s = this.state;
     const c = this.data();
     const colorFor = { cmd: 'var(--text)', out: 'var(--text)', dim: 'var(--dim)', accent: 'var(--ac)', err: '#ff7b72', ai: 'var(--ac)' };
+    const isMobile = window.innerWidth < 768;
     const dockDefs = [
       { id: 'terminal', glyph: '>_', label: 'TERMINAL' },
       { id: 'finder', glyph: '/·', label: 'SECTIONS' },
@@ -1156,12 +1170,23 @@ class Component extends DCLogic {
       c, socials: c.socials || [],
       heroOp: anyOpen ? 0.15 : 1, heroBlur: anyOpen ? 'blur(3px)' : 'none',
       dockItems: dockDefs.map(d => ({
-        ...d, open: s.openApps.includes(d.id), hovered: s.hoverDock === d.id,
+        ...d, open: s.openApps.includes(d.id), hovered: !isMobile && s.hoverDock === d.id,
         click: () => this.openApp(d.id),
         enter: () => this.setState({ hoverDock: d.id })
       })),
       dockLeave: () => this.setState({ hoverDock: null }),
       w: this.winVals(),
+      isMobile,
+      heroRight: isMobile ? '6vw' : '7vw', heroLeft: isMobile ? '6vw' : 'auto',
+      heroAlign: isMobile ? 'center' : 'right', heroItems: isMobile ? 'center' : 'flex-end', heroJustify: isMobile ? 'center' : 'flex-end',
+      dockLeft: isMobile ? '50%' : '16px', dockTop: isMobile ? 'auto' : '50%', dockBottom: isMobile ? '12px' : 'auto',
+      dockTf: isMobile ? 'translateX(-50%)' : 'translateY(-50%)', dockDir: isMobile ? 'row' : 'column', dockBtnSize: isMobile ? '46px' : '52px',
+      dotLeft: isMobile ? '50%' : '-8px', dotTop: isMobile ? 'auto' : '50%', dotBottom: isMobile ? '-9px' : 'auto',
+      dotTf: isMobile ? 'translateX(-50%)' : 'translateY(-50%)',
+      secPadL: isMobile ? '6vw' : 'max(6vw, 120px)', secPadB: isMobile ? '120px' : '80px',
+      aboutCols: isMobile ? '1fr' : '1.6fr 1fr',
+      termFs: isMobile ? '16px' : '13px',
+      termChips: ['help', 'ls', 'cd projects', 'cd skills', 'ai', 'clear'].map(l => ({ label: l, click: () => this.runCommand(l) })),
       termLines: s.termLines.map(l => ({ text: l.text, color: colorFor[l.kind] || 'var(--text)', weight: l.kind === 'cmd' ? '600' : '400' })),
       termInput: s.termInput, termInputType: s.mode === 'password' ? 'password' : 'text',
       promptLabel: s.mode === 'password' ? 'password:' : (s.mode === 'chat' ? 'ai>' : 'guest@tanjim:~$'),
