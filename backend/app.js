@@ -180,7 +180,8 @@ function assetHandler(name, fallbackFile) {
       const m = a.dataUrl.match(/^data:(.+?);base64,(.*)$/);
       if (m) { res.type(m[1]); return res.send(Buffer.from(m[2], 'base64')); }
     }
-    res.sendFile(path.join(__dirname, '..', fallbackFile));
+    // no uploaded asset yet — serve the static default (works on Vercel CDN and local)
+    res.redirect(302, '/' + fallbackFile);
   }));
   app.post('/api/assets/' + name, auth, wrap(async (req, res) => {
     if (!/^data:.+;base64,/.test(req.body.dataUrl || '')) return res.status(400).json({ error: 'dataUrl required' });
