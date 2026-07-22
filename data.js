@@ -2,7 +2,7 @@ var PORTFOLIO_DATA = {
   name: "MD. TANJIMUL HASAN",
   title: "Full Stack Developer · Competitive Programmer · AI Enthusiast",
   tagline: "I’m a Full-Stack Developer passionate about building scalable applications and solving complex problems through code.",
-  level: "LV.24 SOFTWARE ENGINEER",
+  level: "SOFTWARE ENGINEER",
   email: "tanjimulhasan781@gmail.com",
   phone: "+880 1818775169",
   socials: [
