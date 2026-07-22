@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Space+Grotesk:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<script src="./data.js"></script>
+<style>
+@font-face { font-family: 'Monocraft'; src: url('https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft/files/minecraft.woff') format('woff'); font-display: swap; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0b0913; font-family: 'Space Grotesk', sans-serif; }
+a { color: var(--ac, #b39dff); text-decoration: none; }
+a:hover { color: #fff; }
+::selection { background: rgba(140,110,255,.35); }
+[data-theme="purple"] { --ac:#b39dff; --ac2:#7c5cff; --bg:#0b0913; --panel:#151024; --panel2:#1d1633; --border:#332a52; --text:#eae6f7; --dim:#9a92b8; }
+[data-theme="green"] { --ac:#6ee7a0; --ac2:#22c55e; --bg:#081209; --panel:#0f1d12; --panel2:#152819; --border:#24422c; --text:#e7f5ea; --dim:#8fb59a; }
+[data-theme="cyan"] { --ac:#67e8f9; --ac2:#06b6d4; --bg:#071114; --panel:#0e1c21; --panel2:#132830; --border:#1f4550; --text:#e6f6f9; --dim:#8ab3bd; }
+@keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes eq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes popin { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--border, #332a52); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+</style>
+</helmet>
+<div ref="{{ rootRef }}" data-theme="{{ theme }}" style="position:fixed;inset:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif">
+  <canvas ref="{{ canvasRef }}" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+  <sc-if value="{{ crt }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; pointer-events: none; z-index: 2000; background: repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0px, rgba(0,0,0,.22) 1px, transparent 1px, transparent 3px); opacity: .35; mix-blend-mode: overlay"></div>
+  </sc-if>
+  <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 70% 40%, transparent 40%, rgba(0,0,0,.55) 100%)"></div>
+
+  <!-- HERO -->
+  <div data-screen-label="Home" style="position:absolute;right: {{ heroRight }};left: {{ heroLeft }};top:50%;transform:translateY(-50%);max-width:600px;margin:0 auto;text-align: {{ heroAlign }};display:flex;flex-direction:column;align-items: {{ heroItems }};gap:18px;z-index:5;transition:opacity .5s ease, filter .5s ease;opacity: {{ heroOp }}; filter: {{ heroBlur }}">
+    <div style="width:118px;height:118px;border-radius:50%;padding:4px;border:2px solid var(--ac);box-shadow:0 0 30px color-mix(in oklab, var(--ac) 40%, transparent);animation:floaty 5s ease-in-out infinite">
+      <sc-if value="{{ avatarReady }}" hint-placeholder-val="{{ false }}">
+        <img ref="{{ heroImgRef }}" alt="Tanjimul Hasan" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center top; display: block; position: static">
+      </sc-if>
+    </div>
+    <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:11px;letter-spacing:2px;color:var(--bg);background:var(--ac);padding:6px 10px;border-radius:4px">{{ c.level }}</div>
+    <h1 style="margin:0;font-family:'Monocraft','Press Start 2P',monospace;font-size:clamp(26px,3.4vw,46px);line-height:1.25;background:linear-gradient(120deg, var(--text) 30%, var(--ac) 70%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-wrap:balance">{{ c.name }}</h1>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--ac);letter-spacing:1px">{{ c.title }}</div>
+    <p style="margin:0;font-size:16px;line-height:1.6;color:var(--dim);max-width:480px;text-wrap:pretty">{{ c.tagline }}</p>
+    <div style="height:8px;width:280px;border:1px solid var(--border);border-radius:2px;overflow:hidden;background:var(--panel)">
+      <div style="height:100%;width:76%;background:linear-gradient(90deg, var(--ac2), var(--ac));box-shadow:0 0 12px var(--ac)"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content: {{ heroJustify }}">
+      <sc-for list="{{ socials }}" as="s" hint-placeholder-count="5">
+        <a href="{{ s.url }}" target="_blank" rel="noopener" style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:1px;color:var(--ac);border:1px solid var(--border);background:var(--panel);padding:9px 12px;border-radius:4px;transition:all .2s ease" style-hover="background:var(--ac); color:var(--bg); transform:translateY(-3px); box-shadow:0 6px 16px color-mix(in oklab, var(--ac) 35%, transparent)">{{ s.label }}</a>
+      </sc-for>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dim);display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content: {{ heroJustify }}">
+      <span style="color:var(--ac)">▸</span> open the terminal in the dock and type <span style="color:var(--ac);border:1px solid var(--border);padding:2px 7px;border-radius:4px;background:var(--panel)">help</span>
+      <span style="display:inline-block;width:8px;height:15px;background:var(--ac);animation:blink 1.1s step-end infinite"></span>
+    </div>
+  </div>
+
+  <!-- DOCK -->
+  <div style="position:absolute;left: {{ dockLeft }};top: {{ dockTop }};bottom: {{ dockBottom }};transform: {{ dockTf }};z-index:1500;display:flex;flex-direction: {{ dockDir }};gap:9px;padding:11px;border-radius:20px;border:1px solid var(--border);background:color-mix(in oklab, var(--panel) 75%, transparent);backdrop-filter:blur(14px);box-shadow:0 16px 40px rgba(0,0,0,.5)">
+    <sc-for list="{{ dockItems }}" as="d" hint-placeholder-count="6">
+      <div style="position:relative">
+        <button onClick="{{ d.click }}" onMouseEnter="{{ d.enter }}" onMouseLeave="{{ dockLeave }}" title="{{ d.label }}" style="width: {{ dockBtnSize }};height: {{ dockBtnSize }};border-radius:14px;border:1px solid var(--border);background:linear-gradient(140deg, color-mix(in oklab, var(--panel2) 85%, var(--ac)), var(--panel));color:var(--ac);font-family:'Monocraft','Press Start 2P',monospace;font-size:15px;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease;display:flex;align-items:center;justify-content:center" style-hover="transform:scale(1.16) translateX(5px); box-shadow:0 8px 20px color-mix(in oklab, var(--ac) 30%, transparent)">{{ d.glyph }}</button>
+        <sc-if value="{{ d.open }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left: {{ dotLeft }};top: {{ dotTop }};bottom: {{ dotBottom }};transform: {{ dotTf }};width:4px;height:4px;border-radius:50%;background:var(--ac);box-shadow:0 0 6px var(--ac)"></div>
+        </sc-if>
+        <sc-if value="{{ d.hovered }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:64px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:1px;color:var(--text);background:var(--panel2);border:1px solid var(--border);padding:7px 10px;border-radius:6px;animation:popin .18s ease">{{ d.label }}</div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- TERMINAL WINDOW -->
+  <div onClick="{{ w.terminal.wrapClick }}" style="position:absolute;left: {{ w.terminal.left }};top:50%;width: {{ w.terminal.w }};height: {{ w.terminal.h }};margin-left: {{ w.terminal.ml }};margin-top: {{ w.terminal.mt }};border-radius: {{ w.terminal.br }};display:flex;flex-direction:column;background:color-mix(in oklab, var(--panel) 92%, black);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.terminal.tf }}; opacity: {{ w.terminal.op }}; z-index: {{ w.terminal.z }}; pointer-events: {{ w.terminal.pe }}; cursor: {{ w.terminal.cursor }}">
+    <div style="pointer-events: {{ w.terminal.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
+      <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
+        <button onClick="{{ w.terminal.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.terminal.min }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#febc2e;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.terminal.zoomBtn }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#28c840;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <div style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">guest@tanjim — ~/portfolio — zsh</div>
+        <div style="width:60px"></div>
+      </div>
+      <div ref="{{ termBodyRef }}" onClick="{{ focusTerm }}" style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;cursor:text">
+        <sc-for list="{{ termLines }}" as="ln" hint-placeholder-count="3">
+          <div style="white-space:pre-wrap;word-break:break-word;color: {{ ln.color }}; font-weight: {{ ln.weight }}">{{ ln.text }}</div>
+        </sc-for>
+        <div style="display:flex;gap:8px;align-items:baseline">
+          <span style="color:var(--ac);font-weight:700;flex:none">{{ promptLabel }}</span>
+          <input ref="{{ termInputRef }}" value="{{ termInput }}" onChange="{{ onTermChange }}" onKeyDown="{{ onTermKey }}" type="{{ termInputType }}" autocomplete="off" spellcheck="false" style="flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size: {{ termFs }};caret-color:var(--ac)">
+        </div>
+      </div>
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;display:flex;gap:8px;overflow-x:auto;padding:10px 12px;border-top:1px solid var(--border)">
+          <sc-for list="{{ termChips }}" as="ch" hint-placeholder-count="4">
+            <button onClick="{{ ch.click }}" style="flex:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac);background:var(--panel2);border:1px solid var(--border);padding:8px 14px;border-radius:15px;cursor:pointer">{{ ch.label }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- FINDER WINDOW -->
+  <div onClick="{{ w.finder.wrapClick }}" style="position:absolute;left: {{ w.finder.left }};top:50%;width: {{ w.finder.w }};height: {{ w.finder.h }};margin-left: {{ w.finder.ml }};margin-top: {{ w.finder.mt }};border-radius: {{ w.finder.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.finder.tf }}; opacity: {{ w.finder.op }}; z-index: {{ w.finder.z }}; pointer-events: {{ w.finder.pe }}; cursor: {{ w.finder.cursor }}">
+    <div style="pointer-events: {{ w.finder.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
+      <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
+        <button onClick="{{ w.finder.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.finder.min }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#febc2e;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.finder.zoomBtn }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#28c840;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <div style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">sections — ~/portfolio</div>
+        <div style="width:60px"></div>
+      </div>
+      <div style="flex:1;min-height:0;overflow-y:auto;padding:22px;display:grid;grid-template-columns:repeat(auto-fill, minmax(96px, 1fr));gap:16px;align-content:start">
+        <sc-for list="{{ finderItems }}" as="f" hint-placeholder-count="7">
+          <button onClick="{{ f.click }}" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 6px;border-radius:10px;border:1px solid transparent;background:transparent;cursor:pointer;transition:all .2s ease" style-hover="background:var(--panel2); border-color:var(--border)">
+            <div style="position:relative;width:52px;height:40px">
+              <div style="position:absolute;left:0;top:0;width:22px;height:8px;border-radius:3px 3px 0 0;background:var(--ac2)"></div>
+              <div style="position:absolute;left:0;top:6px;right:0;bottom:0;border-radius:3px 6px 6px 6px;background:linear-gradient(160deg, var(--ac), var(--ac2));box-shadow:0 4px 10px color-mix(in oklab, var(--ac2) 40%, transparent)"></div>
+            </div>
+            <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:9px;letter-spacing:1px;color:var(--text)">{{ f.label }}</div>
+          </button>
+        </sc-for>
+        <button onClick="{{ openCvApp }}" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 6px;border-radius:10px;border:1px solid transparent;background:transparent;cursor:pointer;transition:all .2s ease" style-hover="background:var(--panel2); border-color:var(--border)">
+          <div style="width:34px;height:42px;border-radius:4px;background:var(--text);position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;box-sizing:border-box">
+            <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:8px;color:#c0392b;font-weight:700">PDF</div>
+          </div>
+          <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:9px;letter-spacing:1px;color:var(--text)">CV.PDF</div>
+        </button>
+      </div>
+      <div style="flex:none;padding:8px 16px;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">7 items · double-life tip: the terminal can `cd` into any of these</div>
+    </div>
+  </div>
+
+  <!-- MAIL WINDOW -->
+  <div onClick="{{ w.mail.wrapClick }}" style="position:absolute;left: {{ w.mail.left }};top:50%;width: {{ w.mail.w }};height: {{ w.mail.h }};margin-left: {{ w.mail.ml }};margin-top: {{ w.mail.mt }};border-radius: {{ w.mail.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.mail.tf }}; opacity: {{ w.mail.op }}; z-index: {{ w.mail.z }}; pointer-events: {{ w.mail.pe }}; cursor: {{ w.mail.cursor }}">
+    <div style="pointer-events: {{ w.mail.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
+      <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
+        <button onClick="{{ w.mail.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.mail.min }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#febc2e;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.mail.zoomBtn }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#28c840;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <div style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">new message — to: tanjim</div>
+        <div style="width:60px"></div>
+      </div>
+      <sc-if value="{{ mailIdle }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding:20px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-family:'Monocraft','Press Start 2P',monospace;font-size:9px;letter-spacing:1px;color:var(--dim)">TO</label>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ac);border:1px solid var(--border);background:var(--panel2);padding:10px 12px;border-radius:6px">{{ c.email }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-family:'Monocraft','Press Start 2P',monospace;font-size:9px;letter-spacing:1px;color:var(--dim)">FROM</label>
+            <input value="{{ mailFrom }}" onChange="{{ onMailFrom }}" placeholder="your@email.com" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);border:1px solid var(--border);background:var(--panel2);padding:10px 12px;border-radius:6px;outline:none" style-focus="border-color:var(--ac)">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-family:'Monocraft','Press Start 2P',monospace;font-size:9px;letter-spacing:1px;color:var(--dim)">SUBJECT</label>
+            <input value="{{ mailSubject }}" onChange="{{ onMailSubject }}" placeholder="Let's build something" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);border:1px solid var(--border);background:var(--panel2);padding:10px 12px;border-radius:6px;outline:none" style-focus="border-color:var(--ac)">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+            <label style="font-family:'Monocraft','Press Start 2P',monospace;font-size:9px;letter-spacing:1px;color:var(--dim)">MESSAGE</label>
+            <textarea value="{{ mailBody }}" onChange="{{ onMailBody }}" placeholder="Hi Tanjim, ..." style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);border:1px solid var(--border);background:var(--panel2);padding:10px 12px;border-radius:6px;outline:none;resize:none;flex:1;min-height:120px" style-focus="border-color:var(--ac)"></textarea>
+          </div>
+          <sc-if value="{{ mailErr }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#ff7b72">{{ mailErr }}</div>
+          </sc-if>
+          <button onClick="{{ sendMail }}" style="font-family:'Monocraft','Press Start 2P',monospace;font-size:11px;letter-spacing:2px;color:var(--bg);background:var(--ac);border:none;padding:14px;border-radius:6px;cursor:pointer;transition:all .2s ease" style-hover="transform:translateY(-2px); box-shadow:0 8px 20px color-mix(in oklab, var(--ac) 40%, transparent)">{{ mailBtnLabel }}</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ mailSent }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:30px;text-align:center">
+          <div style="width:64px;height:64px;border-radius:50%;border:2px solid var(--ac);display:flex;align-items:center;justify-content:center;color:var(--ac);font-size:28px;animation:popin .4s cubic-bezier(.34,1.56,.64,1)">✓</div>
+          <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:13px;color:var(--ac);letter-spacing:1px">MESSAGE SENT</div>
+          <div style="font-size:14px;color:var(--dim);max-width:300px">Quest complete. Tanjim will get back to you soon.</div>
+          <button onClick="{{ mailAgain }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac);background:transparent;border:1px solid var(--border);padding:9px 16px;border-radius:6px;cursor:pointer" style-hover="border-color:var(--ac)">compose another</button>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- SETTINGS WINDOW -->
+  <div onClick="{{ w.settings.wrapClick }}" style="position:absolute;left: {{ w.settings.left }};top:50%;width: {{ w.settings.w }};height: {{ w.settings.h }};margin-left: {{ w.settings.ml }};margin-top: {{ w.settings.mt }};border-radius: {{ w.settings.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.settings.tf }}; opacity: {{ w.settings.op }}; z-index: {{ w.settings.z }}; pointer-events: {{ w.settings.pe }}; cursor: {{ w.settings.cursor }}">
+    <div style="pointer-events: {{ w.settings.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
+      <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
+        <button onClick="{{ w.settings.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.settings.min }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#febc2e;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.settings.zoomBtn }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#28c840;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <div style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">system settings</div>
+        <div style="width:60px"></div>
+      </div>
+      <div style="flex:1;min-height:0;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:2px;color:var(--dim)">THEME</div>
+          <div style="display:flex;gap:12px">
+            <sc-for list="{{ themeOptions }}" as="t" hint-placeholder-count="3">
+              <button onClick="{{ t.click }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:10px;cursor:pointer;background:var(--panel2);transition:all .2s ease;border:1px solid {{ t.borderColor }}" style-hover="transform:translateY(-2px)">
+                <div style="width:34px;height:34px;border-radius:8px;background: {{ t.swatch }}; box-shadow:0 4px 12px {{ t.glow }}"></div>
+                <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:9px;letter-spacing:1px;color:var(--text)">{{ t.label }}</div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:2px;color:var(--dim)">BACKGROUND</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text)">code rain</div>
+            <button onClick="{{ toggleRain }}" style="width:44px;height:24px;border-radius:12px;border:1px solid var(--border);cursor:pointer;position:relative;transition:background .2s ease;background: {{ rainToggleBg }}">
+              <div style="position:absolute;top:2px;width:18px;height:18px;border-radius:50%;background:var(--text);transition:left .2s ease;left: {{ rainKnobLeft }}"></div>
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);flex:none">intensity</div>
+            <input type="range" min="0" max="1" step="0.1" value="{{ rainLevel }}" onChange="{{ onRainLevel }}" style="flex:1;accent-color:var(--ac)">
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text)">CRT scanlines</div>
+            <button onClick="{{ toggleCrt }}" style="width:44px;height:24px;border-radius:12px;border:1px solid var(--border);cursor:pointer;position:relative;transition:background .2s ease;background: {{ crtToggleBg }}">
+              <div style="position:absolute;top:2px;width:18px;height:18px;border-radius:50%;background:var(--text);transition:left .2s ease;left: {{ crtKnobLeft }}"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CV WINDOW -->
+  <div onClick="{{ w.cv.wrapClick }}" style="position:absolute;left: {{ w.cv.left }};top:50%;width: {{ w.cv.w }};height: {{ w.cv.h }};margin-left: {{ w.cv.ml }};margin-top: {{ w.cv.mt }};border-radius: {{ w.cv.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.cv.tf }}; opacity: {{ w.cv.op }}; z-index: {{ w.cv.z }}; pointer-events: {{ w.cv.pe }}; cursor: {{ w.cv.cursor }}">
+    <div style="pointer-events: {{ w.cv.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
+      <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
+        <button onClick="{{ w.cv.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.cv.min }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#febc2e;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.cv.zoomBtn }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#28c840;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <div style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">cv.pdf — preview</div>
+        <a href="{{ cvSrc }}" download="Tanjimul_Hasan_CV.pdf" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac)">download ↓</a>
+      </div>
+      <sc-if value="{{ cvOpen }}" hint-placeholder-val="{{ false }}">
+        <iframe ref="{{ cvIframeRef }}" title="CV" style="flex:1;border:none;background:#3a3a3e"></iframe>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- MUSIC WINDOW -->
+  <div onClick="{{ w.music.wrapClick }}" style="position:absolute;left: {{ w.music.left }};top:50%;width: {{ w.music.w }};height: {{ w.music.h }};margin-left: {{ w.music.ml }};margin-top: {{ w.music.mt }};border-radius: {{ w.music.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.music.tf }}; opacity: {{ w.music.op }}; z-index: {{ w.music.z }}; pointer-events: {{ w.music.pe }}; cursor: {{ w.music.cursor }}">
+    <div style="pointer-events: {{ w.music.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
+      <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
+        <button onClick="{{ w.music.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.music.min }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#febc2e;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <div style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">chiptune.fm</div>
+        <div style="width:36px"></div>
+      </div>
+      <div style="flex:1;display:flex;align-items:center;gap:18px;padding:0 22px">
+        <button onClick="{{ toggleMusic }}" style="width:54px;height:54px;border-radius:50%;border:2px solid var(--ac);background:transparent;color:var(--ac);font-size:18px;cursor:pointer;flex:none;transition:all .2s ease" style-hover="background:var(--ac); color:var(--bg)">{{ musicGlyph }}</button>
+        <div style="display:flex;flex-direction:column;gap:8px;flex:1;min-width:0">
+          <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:1px;color:var(--text)">OVERWORLD LOOP</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">original 8-bit · tanjim radio</div>
+          <div style="display:flex;gap:4px;align-items:flex-end;height:22px">
+            <div style="width:5px;height:100%;background:var(--ac);transform-origin:bottom;animation:eq .7s ease-in-out infinite;animation-play-state: {{ eqPlay }}"></div>
+            <div style="width:5px;height:100%;background:var(--ac);transform-origin:bottom;animation:eq .5s ease-in-out .1s infinite;animation-play-state: {{ eqPlay }}"></div>
+            <div style="width:5px;height:100%;background:var(--ac);transform-origin:bottom;animation:eq .9s ease-in-out .2s infinite;animation-play-state: {{ eqPlay }}"></div>
+            <div style="width:5px;height:100%;background:var(--ac);transform-origin:bottom;animation:eq .6s ease-in-out .05s infinite;animation-play-state: {{ eqPlay }}"></div>
+            <div style="width:5px;height:100%;background:var(--ac);transform-origin:bottom;animation:eq .8s ease-in-out .15s infinite;animation-play-state: {{ eqPlay }}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN WINDOW -->
+  <div onClick="{{ w.admin.wrapClick }}" style="position:absolute;left: {{ w.admin.left }};top:50%;width: {{ w.admin.w }};height: {{ w.admin.h }};margin-left: {{ w.admin.ml }};margin-top: {{ w.admin.mt }};border-radius: {{ w.admin.br }};display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.65);overflow:hidden;transition:transform .55s cubic-bezier(.32,.72,0,1), opacity .4s ease;transform: {{ w.admin.tf }}; opacity: {{ w.admin.op }}; z-index: {{ w.admin.z }}; pointer-events: {{ w.admin.pe }}; cursor: {{ w.admin.cursor }}">
+    <div style="pointer-events: {{ w.admin.innerPe }};display:flex;flex-direction:column;flex:1;min-height:0">
+      <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;background:var(--panel2);border-bottom:1px solid var(--border);flex:none">
+        <button onClick="{{ w.admin.close }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#ff5f57;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.admin.min }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#febc2e;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <button onClick="{{ w.admin.zoomBtn }}" style="width:12px;height:12px;border-radius:50%;border:none;background:#28c840;cursor:pointer" style-hover="filter:brightness(1.3)"></button>
+        <div style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">admin — root@tanjim</div>
+        <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:8px;color:#ff5f57;letter-spacing:1px">{{ serverBadge }}</div>
+      </div>
+      <div style="display:flex;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border);flex:none">
+        <sc-for list="{{ adminTabs }}" as="tab" hint-placeholder-count="3">
+          <button onClick="{{ tab.click }}" style="font-family:'Monocraft','Press Start 2P',monospace;font-size:9px;letter-spacing:1px;padding:8px 14px;border-radius:6px;cursor:pointer;border:1px solid {{ tab.border }}; background: {{ tab.bg }}; color: {{ tab.color }}">{{ tab.label }}</button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ adminOnContent }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:16px">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <select value="{{ adminSection }}" onChange="{{ onAdminSection }}" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;outline:none">
+              <option value="about">about</option>
+              <option value="tagline">tagline</option>
+              <option value="education">education</option>
+              <option value="projects">projects</option>
+              <option value="skills">skills</option>
+              <option value="experience">experience</option>
+              <option value="achievements">achievements</option>
+              <option value="socials">socials</option>
+            </select>
+            <div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden">
+              <button onClick="{{ modeUiClick }}" style="font-family:'Monocraft','Press Start 2P',monospace;font-size:8px;letter-spacing:1px;padding:8px 12px;border:none;cursor:pointer;background: {{ modeUiBg }}; color: {{ modeUiColor }}">UI</button>
+              <button onClick="{{ modeCodeClick }}" style="font-family:'Monocraft','Press Start 2P',monospace;font-size:8px;letter-spacing:1px;padding:8px 12px;border:none;cursor:pointer;background: {{ modeCodeBg }}; color: {{ modeCodeColor }}">CODE</button>
+            </div>
+            <button onClick="{{ adminSave }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--bg);background:var(--ac);border:none;padding:9px 16px;border-radius:6px;cursor:pointer" style-hover="filter:brightness(1.15)">save changes</button>
+            <button onClick="{{ adminResetAll }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#ff7b72;background:transparent;border:1px solid var(--border);padding:9px 14px;border-radius:6px;cursor:pointer" style-hover="border-color:#ff7b72">reset all to CV defaults</button>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac)">{{ adminMsg }}</div>
+          </div>
+          <sc-if value="{{ adminModeCode }}" hint-placeholder-val="{{ false }}">
+            <textarea value="{{ adminJson }}" onChange="{{ onAdminJson }}" spellcheck="false" style="flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:14px;outline:none;resize:none" style-focus="border-color:var(--ac)"></textarea>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">Raw JSON. Saved to this browser — the live site reads your edits instantly.</div>
+          </sc-if>
+          <sc-if value="{{ adminModeUi }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+              <sc-if value="{{ adminIsText }}" hint-placeholder-val="{{ false }}">
+                <textarea value="{{ adminText }}" onChange="{{ onAdminText }}" style="min-height:160px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:14px;outline:none;resize:vertical" style-focus="border-color:var(--ac)"></textarea>
+              </sc-if>
+              <sc-for list="{{ adminItems }}" as="it" hint-placeholder-count="2">
+                <div style="border:1px solid var(--border);background:var(--panel2);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--ac)">{{ it.title }}</div>
+                    <button onClick="{{ it.remove }}" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#ff7b72;background:transparent;border:1px solid var(--border);padding:4px 10px;border-radius:5px;cursor:pointer" style-hover="border-color:#ff7b72">remove</button>
+                  </div>
+                  <sc-for list="{{ it.fields }}" as="f" hint-placeholder-count="3">
+                    <div style="display:flex;flex-direction:column;gap:4px">
+                      <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dim);text-transform:uppercase">{{ f.label }}</label>
+                      <sc-if value="{{ f.multi }}" hint-placeholder-val="{{ false }}">
+                        <textarea value="{{ f.value }}" onChange="{{ f.onChange }}" style="min-height:64px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:9px 11px;outline:none;resize:vertical" style-focus="border-color:var(--ac)"></textarea>
+                      </sc-if>
+                      <sc-if value="{{ f.single }}" hint-placeholder-val="{{ true }}">
+                        <input value="{{ f.value }}" onChange="{{ f.onChange }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:9px 11px;outline:none" style-focus="border-color:var(--ac)">
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+              <sc-if value="{{ adminIsList }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ adminAddItem }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac);background:transparent;border:1px dashed var(--border);padding:11px;border-radius:8px;cursor:pointer" style-hover="border-color:var(--ac)">+ add item</button>
+              </sc-if>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">Fields marked “one per line” take multiple entries. Hit save changes to apply.</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{ adminOnInbox }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <sc-if value="{{ inboxHasAny }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ inboxClearAll }}" style="align-self:flex-end;font-family:'JetBrains Mono',monospace;font-size:11px;color:#ff7b72;background:transparent;border:1px solid var(--border);padding:6px 12px;border-radius:5px;cursor:pointer" style-hover="border-color:#ff7b72">clear all</button>
+          </sc-if>
+          <sc-if value="{{ inboxEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dim);text-align:center;padding:40px 0">inbox zero — no messages yet</div>
+          </sc-if>
+          <sc-for list="{{ inbox }}" as="m" hint-placeholder-count="2">
+            <div style="border:1px solid var(--border);background:var(--panel2);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;gap:10px">
+                <div style="display:flex;align-items:center;gap:8px;min-width:0">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ac);font-weight:700">{{ m.subject }}</div>
+                  <sc-if value="{{ m.label }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:7px;letter-spacing:1px;flex:none;padding:3px 7px;border-radius:3px;color:var(--bg);background: {{ m.labelBg }}">{{ m.label }}</div>
+                  </sc-if>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">{{ m.date }}</div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">from: {{ m.from }}</div>
+                <button onClick="{{ m.remove }}" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#ff7b72;background:transparent;border:1px solid var(--border);padding:4px 10px;border-radius:5px;cursor:pointer;flex:none" style-hover="border-color:#ff7b72">delete</button>
+              </div>
+              <div style="font-size:13px;color:var(--text);white-space:pre-wrap">{{ m.body }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ adminOnSecurity }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;max-width:420px">
+          <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:2px;color:var(--dim)">CHANGE ADMIN PASSWORD</div>
+          <input type="password" value="{{ passCurrent }}" onChange="{{ onPassCurrent }}" placeholder="current password" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);border:1px solid var(--border);background:var(--panel2);padding:10px 12px;border-radius:6px;outline:none" style-focus="border-color:var(--ac)">
+          <input type="password" value="{{ passNew }}" onChange="{{ onPassNew }}" placeholder="new password (min 6 chars)" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);border:1px solid var(--border);background:var(--panel2);padding:10px 12px;border-radius:6px;outline:none" style-focus="border-color:var(--ac)">
+          <button onClick="{{ changePass }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--bg);background:var(--ac);border:none;padding:10px;border-radius:6px;cursor:pointer" style-hover="filter:brightness(1.15)">update password</button>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac)">{{ passMsg }}</div>
+          <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);margin-top:10px">TERMINAL AI — GROQ KEY</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);line-height:1.5">Private — stored only in this (your) browser. Visitors never see it: they get the server AI proxy, or the in-browser WebLLM fallback. Free key at console.groq.com.</div>
+          <div style="display:flex;gap:8px">
+            <input type="password" value="{{ groqKeyDraft }}" onChange="{{ onGroqKey }}" placeholder="gsk_..." style="flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);border:1px solid var(--border);background:var(--panel2);padding:9px 12px;border-radius:6px;outline:none" style-focus="border-color:var(--ac)">
+            <button onClick="{{ saveGroqKey }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--bg);background:var(--ac);border:none;padding:9px 14px;border-radius:6px;cursor:pointer" style-hover="filter:brightness(1.15)">save</button>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac)">{{ groqStatus }}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);line-height:1.6">Access is terminal-only: type `sudo admin`. Nothing on the public site links here.</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ adminOnCv }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;max-width:460px">
+          <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:2px;color:var(--dim)">RESUME FILE</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text)">current: <span style="color:var(--ac)">{{ cvLabel }}</span></div>
+          <label style="display:flex;flex-direction:column;gap:8px;border:1px dashed var(--border);border-radius:8px;padding:16px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)" style-hover="border-color:var(--ac)">
+            upload a new cv (pdf, under 3 MB)
+            <input type="file" accept="application/pdf" onChange="{{ onCvFile }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text)">
+          </label>
+          <button onClick="{{ cvReset }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#ff7b72;background:transparent;border:1px solid var(--border);padding:9px 14px;border-radius:6px;cursor:pointer;align-self:flex-start" style-hover="border-color:#ff7b72">restore default cv</button>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac)">{{ cvMsg }}</div>
+          <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);margin-top:10px">AVATAR PHOTO</div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <sc-if value="{{ avatarReady }}" hint-placeholder-val="{{ false }}">
+              <img ref="{{ adminImgRef }}" alt="avatar preview" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid var(--border)">
+            </sc-if>
+            <label style="flex:1;display:flex;flex-direction:column;gap:8px;border:1px dashed var(--border);border-radius:8px;padding:12px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)" style-hover="border-color:var(--ac)">
+              upload a new photo (jpg/png, under 1.5 MB — square works best)
+              <input type="file" accept="image/*" onChange="{{ onAvatarFile }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text)">
+            </label>
+          </div>
+          <button onClick="{{ avatarReset }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#ff7b72;background:transparent;border:1px solid var(--border);padding:9px 14px;border-radius:6px;cursor:pointer;align-self:flex-start" style-hover="border-color:#ff7b72">restore default photo</button>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac)">{{ avatarMsg }}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);line-height:1.6">Stored in this browser. The Resume window and its download button switch to the new file immediately.</div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- SECTION OVERLAY -->
+  <div data-screen-label="Section overlay" style="position:fixed;inset:0;z-index:900;background:color-mix(in oklab, var(--bg) 96%, black);transition:transform .6s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column;transform: translateY({{ sectionTY }})">
+    <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:20px 6vw 20px {{ secPadL }};border-bottom:1px solid var(--border)">
+      <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:16px;letter-spacing:2px;color:var(--ac)">~/{{ sectionName }}</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">esc to exit</div>
+        <button onClick="{{ closeSection }}" style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-size:15px;cursor:pointer;transition:all .2s ease" style-hover="border-color:#ff5f57; color:#ff5f57">✕</button>
+      </div>
+    </div>
+    <div style="flex:1;min-height:0;overflow-y:auto;padding:44px 6vw {{ secPadB }} {{ secPadL }}">
+      <div style="max-width:1000px;margin:0 auto">
+        <sc-if value="{{ secAbout }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns: {{ aboutCols }};gap:32px;align-items:start">
+            <p style="margin:0;font-size:18px;line-height:1.8;color:var(--text);text-wrap:pretty">{{ c.about }}</p>
+            <div style="border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:14px">
+              <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:10px;letter-spacing:2px;color:var(--ac)">PLAYER STATS</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dim);display:flex;flex-direction:column;gap:9px">
+                <div><span style="color:var(--ac)">mail </span>{{ c.email }}</div>
+                <div><span style="color:var(--ac)">tel  </span>{{ c.phone }}</div>
+                <div><span style="color:var(--ac)">base </span>Khulna, Bangladesh</div>
+                <div><span style="color:var(--ac)">guild</span> SGIPC KUET — Vice President</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ secEducation }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:0">
+            <sc-for list="{{ c.education }}" as="e" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:20px 1fr;gap:22px">
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div style="width:14px;height:14px;background:var(--ac);flex:none;box-shadow:0 0 10px var(--ac)"></div>
+                  <div style="width:2px;flex:1;background:var(--border)"></div>
+                </div>
+                <div style="padding-bottom:30px">
+                  <div style="border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:8px;transition:all .2s ease" style-hover="border-color:var(--ac); transform:translateX(6px)">
+                    <div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap">
+                      <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:12px;color:var(--text);line-height:1.5">{{ e.school }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);flex:none">{{ e.period }}</div>
+                    </div>
+                    <div style="font-size:15px;color:var(--text)">{{ e.degree }} · {{ e.place }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ac)">{{ e.result }}</div>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ secProjects }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));gap:20px">
+            <sc-for list="{{ c.projects }}" as="p" hint-placeholder-count="3">
+              <div style="border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:14px;transition:all .25s ease" style-hover="border-color:var(--ac); transform:translateY(-5px); box-shadow:0 14px 34px rgba(0,0,0,.4)">
+                <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:14px;color:var(--ac)">{{ p.name }}</div>
+                <div style="font-size:14px;color:var(--text);font-weight:500">{{ p.subtitle }}</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ p.points }}" as="pt" hint-placeholder-count="2">
+                    <div style="font-size:13px;line-height:1.6;color:var(--dim);display:flex;gap:8px"><span style="color:var(--ac);flex:none">▪</span><span>{{ pt }}</span></div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:auto">
+                  <sc-for list="{{ p.tech }}" as="t" hint-placeholder-count="4">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);border:1px solid var(--border);background:var(--panel2);padding:3px 8px;border-radius:4px">{{ t }}</span>
+                  </sc-for>
+                </div>
+                <a href="{{ p.url }}" target="_blank" rel="noopener" style="font-family:'Monocraft','Press Start 2P',monospace;font-size:9px;letter-spacing:1px;color:var(--text)" style-hover="color:var(--ac)">VIEW ON GITHUB →</a>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ secSkills }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:26px">
+            <sc-for list="{{ c.skills }}" as="g" hint-placeholder-count="5">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:11px;letter-spacing:2px;color:var(--ac)">{{ g.cat }}</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                  <sc-for list="{{ g.items }}" as="s" hint-placeholder-count="4">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text);border:1px solid var(--border);background:var(--panel);padding:10px 16px;border-radius:6px;transition:all .2s ease" style-hover="border-color:var(--ac); color:var(--ac); transform:translateY(-3px)">{{ s }}</div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ secExperience }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:24px">
+            <div style="border:1px dashed var(--border);border-radius:12px;padding:26px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center">
+              <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:12px;color:var(--dim);letter-spacing:1px">INDUSTRY XP: LOADING…</div>
+              <div style="font-size:14px;color:var(--dim);max-width:440px">Main quest in progress — graduating July 2026. Meanwhile, here are the side quests:</div>
+            </div>
+            <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:11px;letter-spacing:2px;color:var(--ac)">LEADERSHIP &amp; INVOLVEMENT</div>
+            <sc-for list="{{ c.experience }}" as="x" hint-placeholder-count="2">
+              <div style="border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:8px" style-hover="border-color:var(--ac)">
+                <div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap">
+                  <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:12px;color:var(--text)">{{ x.role }}</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)">{{ x.period }}</div>
+                </div>
+                <div style="font-size:14px;color:var(--ac)">{{ x.org }}</div>
+                <sc-for list="{{ x.points }}" as="pt" hint-placeholder-count="1">
+                  <div style="font-size:14px;line-height:1.6;color:var(--dim)">{{ pt }}</div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ secAchievements }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:20px">
+            <sc-for list="{{ c.achievements }}" as="a" hint-placeholder-count="4">
+              <div style="border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:12px;transition:all .25s ease" style-hover="border-color:var(--ac); transform:translateY(-5px)">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+                  <div style="width:34px;height:34px;background:linear-gradient(140deg, var(--ac), var(--ac2));border-radius:6px;box-shadow:0 0 14px color-mix(in oklab, var(--ac) 45%, transparent)"></div>
+                  <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:8px;letter-spacing:1px;color:var(--bg);background:var(--ac);padding:4px 8px;border-radius:3px">{{ a.tag }}</div>
+                </div>
+                <div style="font-family:'Monocraft','Press Start 2P',monospace;font-size:12px;line-height:1.6;color:var(--text)">{{ a.title }}</div>
+                <div style="font-size:13px;line-height:1.6;color:var(--dim)">{{ a.detail }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;purple&quot;,&quot;green&quot;,&quot;cyan&quot;],&quot;default&quot;:&quot;purple&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Look&quot;},&quot;rainIntensity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.1,&quot;default&quot;:0.2,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Look&quot;},&quot;crtEffect&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Look&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let theme = 'purple', groqKey = '', overrides = null, pass = null;
+    try {
+      theme = localStorage.getItem('pf_theme') || (props && props.defaultTheme) || 'purple';
+      groqKey = localStorage.getItem('pf_groq') || '';
+      overrides = JSON.parse(localStorage.getItem('pf_content') || 'null');
+      pass = localStorage.getItem('pf_admin');
+    } catch (e) {}
+    this.state = {
+      theme, groqKey, groqKeyDraft: groqKey, overrides,
+      openApps: [], activeApp: null, zoomed: {},
+      section: null, lastSection: 'about',
+      termLines: [
+        { text: "TANJIM.EXE v2.0 — portfolio shell", kind: 'accent' },
+        { text: "type 'help' for commands · 'cd about' to explore · 'ai <question>' to ask the AI about me", kind: 'dim' },
+        { text: "", kind: 'out' }
+      ],
+      termInput: '', mode: 'normal', history: [], histIdx: -1,
+      mailFrom: '', mailSubject: '', mailBody: '', mailState: 'idle', mailErr: '',
+      rain: true, rainLevel: (props && props.rainIntensity != null) ? props.rainIntensity : 0.5,
+      crt: (props && props.crtEffect != null) ? props.crtEffect : true,
+      hoverDock: null, groqStatus: groqKey ? 'groq key active ✓' : '',
+      adminTab: 'content', adminSection: 'about', adminJson: '', adminMsg: '',
+      adminMode: 'ui', adminDraft: null, cvMsg: '', avatarMsg: '',
+      cvSrc: (function () { try { return localStorage.getItem('pf_cv') || 'cv.pdf'; } catch (e) { return 'cv.pdf'; } })(),
+      avatarSrc: (function () { try { return localStorage.getItem('pf_avatar') || 'avatar.png'; } catch (e) { return 'avatar.png'; } })(),
+      passCurrent: '', passNew: '', passMsg: '',
+      musicOn: false, aiBusy: false,
+      serverMode: false, serverContent: null, serverInbox: [],
+      apiBase: (function () { try { return (localStorage.getItem('pf_api') || '').replace(/\/$/, ''); } catch (e) { return ''; } })(),
+      token: (function () { try { return localStorage.getItem('pf_token') || ''; } catch (e) { return ''; } })()
+    };
+    this.pass = pass || 'letmein';
+    this.sections = ['about', 'education', 'projects', 'skills', 'experience', 'achievements'];
+    this.rootRef = el => { this.rootEl = el; };
+    this.canvasRef = el => { this.canvasEl = el; };
+    this.termBodyRef = el => { this.termEl = el; };
+    this.termInputRef = el => { this.termInputEl = el; };
+    this.heroImgRef = el => { this.heroImgEl = el; if (el) el.src = this.state.avatarSrc; };
+    this.adminImgRef = el => { this.adminImgEl = el; if (el) el.src = this.state.avatarSrc; };
+    this.cvIframeRef = el => { this.cvIframeEl = el; if (el) el.src = this.state.cvSrc; };
+  }
+
+  componentDidUpdate() {
+    [this.heroImgEl, this.adminImgEl].forEach(el => {
+      if (el && el.getAttribute('src') !== this.state.avatarSrc) el.src = this.state.avatarSrc;
+    });
+    if (this.cvIframeEl && this.cvIframeEl.getAttribute('src') !== this.state.cvSrc) {
+      this.cvIframeEl.src = this.state.cvSrc;
+    }
+  }
+
+  async apiFetch(p, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+    if (this.state.token) opts.headers['Authorization'] = 'Bearer ' + this.state.token;
+    const r = await fetch((this.state.apiBase || '') + '/api' + p, opts);
+    if (!r.ok) {
+      let msg = 'http ' + r.status;
+      try { const j = await r.json(); if (j.error) msg = j.error; } catch (e) {}
+      throw new Error(msg);
+    }
+    return r.json();
+  }
+
+  async detectServer() {
+    try {
+      const j = await this.apiFetch('/content');
+      const b = this.state.apiBase || '';
+      this.setState({ serverMode: true, serverContent: j.content, cvSrc: b + '/api/assets/cv', avatarSrc: b + '/api/assets/avatar' });
+    } catch (e) { this.setState({ serverMode: false }); }
+  }
+
+  data() {
+    if (this.state.serverMode && this.state.serverContent) return this.state.serverContent;
+    const base = window.PORTFOLIO_DATA || {};
+    return Object.assign({}, base, this.state.overrides || {});
+  }
+
+  componentDidMount() {
+    if (!window.PORTFOLIO_DATA) {
+      const poll = setInterval(() => { if (window.PORTFOLIO_DATA) { clearInterval(poll); this.forceUpdate(); } }, 50);
+    }
+    this.onResize = () => this.forceUpdate();
+    window.addEventListener('resize', this.onResize);
+    this.onKey = e => {
+      if (e.key === 'Escape' && this.state.section) this.setState({ section: null });
+    };
+    window.addEventListener('keydown', this.onKey);
+    this.startRain();
+    this.detectServer();
+    this.syncAdmin('about');
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('keydown', this.onKey);
+    cancelAnimationFrame(this.rainRaf);
+    this.stopMusic();
+  }
+
+  // ---------- code rain ----------
+  startRain() {
+    const cv = this.canvasEl; if (!cv) return;
+    const ctx = cv.getContext('2d');
+    const chars = '01<>{}[]#$+*=;λΔアイウエオカキクケコ';
+    let drops = [], fw = 0, frame = 0, acc = '#b39dff', bgRGB = '11,9,19';
+    const resize = () => {
+      cv.width = window.innerWidth; cv.height = window.innerHeight;
+      fw = 15; drops = Array(Math.ceil(cv.width / fw)).fill(0).map(() => Math.random() * -cv.height / fw);
+    };
+    resize();
+    this.rainResize = resize;
+    window.addEventListener('resize', resize);
+    const readColors = () => {
+      if (!this.rootEl) return;
+      const cs = getComputedStyle(this.rootEl);
+      acc = cs.getPropertyValue('--ac').trim() || acc;
+      const m = (cs.backgroundColor || '').match(/\d+, ?\d+, ?\d+/);
+      if (m) bgRGB = m[0];
+    };
+    readColors();
+    const tick = () => {
+      this.rainRaf = requestAnimationFrame(tick);
+      frame++;
+      if (frame % 60 === 0) readColors();
+      if (frame % 2 !== 0) return;
+      const lvl = this.state.rain ? this.state.rainLevel : 0;
+      ctx.fillStyle = 'rgba(' + bgRGB + ',0.13)';
+      ctx.fillRect(0, 0, cv.width, cv.height);
+      if (lvl <= 0) return;
+      ctx.font = '13px "JetBrains Mono", monospace';
+      ctx.fillStyle = acc;
+      ctx.globalAlpha = 0.16 + lvl * 0.22;
+      for (let i = 0; i < drops.length; i++) {
+        if ((i * 37) % 100 > lvl * 100) continue;
+        ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * fw, drops[i] * fw);
+        if (drops[i] * fw > cv.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i] += 0.5 + (i % 5) * 0.12;
+      }
+      ctx.globalAlpha = 1;
+    };
+    tick();
+  }
+
+  // ---------- windows ----------
+  openApp(id) {
+    this.setState(s => ({
+      openApps: s.openApps.includes(id) ? s.openApps : s.openApps.concat(id),
+      activeApp: id, section: null
+    }), () => { if (id === 'terminal') this.focusTerm(); });
+  }
+  closeApp(id) {
+    this.setState(s => {
+      const rest = s.openApps.filter(a => a !== id);
+      return { openApps: rest, activeApp: s.activeApp === id ? (rest[rest.length - 1] || null) : s.activeApp };
+    });
+  }
+  minApp(id) {
+    this.setState(s => ({ activeApp: s.activeApp === id ? (s.openApps.find(a => a !== id) || null) : s.activeApp }));
+  }
+  zoomApp(id) { this.setState(s => ({ zoomed: Object.assign({}, s.zoomed, { [id]: !s.zoomed[id] }) })); }
+
+  winVals() {
+    const sizes = { terminal: [760, 480], finder: [640, 440], mail: [520, 560], settings: [480, 580], cv: [720, 620], music: [340, 200], admin: [780, 580] };
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const mob = vw < 768;
+    const { openApps, activeApp, zoomed } = this.state;
+    const staged = openApps.filter(a => a !== activeApp);
+    const out = {};
+    Object.keys(sizes).forEach(id => {
+      const [W, H] = sizes[id];
+      const isOpen = openApps.includes(id);
+      const geom = mob
+        ? { left: '50%', w: vw + 'px', h: (vh - 88) + 'px', ml: (-vw / 2) + 'px', mt: (-vh / 2) + 'px', br: '0' }
+        : { left: 'calc(50% + 45px)', w: W + 'px', h: H + 'px', ml: (-W / 2) + 'px', mt: (-H / 2) + 'px', br: '12px' };
+      const base = Object.assign({
+        close: e => { e && e.stopPropagation(); this.closeApp(id); },
+        min: e => { e && e.stopPropagation(); this.minApp(id); },
+        zoomBtn: e => { e && e.stopPropagation(); this.zoomApp(id); }
+      }, geom);
+      if (!isOpen) {
+        out[id] = Object.assign(base, { tf: 'translateY(70px) scale(.7)', op: 0, z: 10, pe: 'none', innerPe: 'none', cursor: 'default', wrapClick: null });
+      } else if (id === activeApp) {
+        let s = 1;
+        if (!mob && zoomed[id]) s = Math.min((vh - 70) / H, (vw - 300) / W);
+        out[id] = Object.assign(base, { tf: 'translate(0px, 0px) scale(' + s.toFixed(3) + ')', op: 1, z: 500, pe: 'auto', innerPe: 'auto', cursor: 'default', wrapClick: null });
+      } else if (mob) {
+        out[id] = Object.assign(base, { tf: 'translateY(60px) scale(.96)', op: 0, z: 50, pe: 'none', innerPe: 'none', cursor: 'default', wrapClick: null });
+      } else {
+        const i = staged.indexOf(id);
+        const sc = 110 / H;
+        const tx = 205 - (vw / 2 + 45), ty = (150 + i * 145) - vh / 2;
+        out[id] = Object.assign(base, { tf: 'translate(' + tx + 'px, ' + ty + 'px) scale(' + sc.toFixed(3) + ')', op: 0.95, z: 100 + i, pe: 'auto', innerPe: 'none', cursor: 'pointer', wrapClick: () => this.setState({ activeApp: id }) });
+      }
+    });
+    return out;
+  }
+
+  // ---------- terminal ----------
+  focusTerm = () => { this.termInputEl && this.termInputEl.focus(); };
+  push(lines, cb) {
+    const arr = Array.isArray(lines) ? lines : [lines];
+    this.setState(s => ({ termLines: s.termLines.concat(arr) }), () => {
+      if (this.termEl) this.termEl.scrollTop = this.termEl.scrollHeight;
+      cb && cb();
+    });
+  }
+  replaceLast(text, kind) {
+    this.setState(s => {
+      const tl = s.termLines.slice();
+      tl[tl.length - 1] = { text, kind };
+      return { termLines: tl };
+    }, () => { if (this.termEl) this.termEl.scrollTop = this.termEl.scrollHeight; });
+  }
+
+  flat() {
+    const c = this.data(); const L = [];
+    L.push('about: ' + (c.about || ''));
+    (c.education || []).forEach(e => L.push('education: ' + e.school + ' — ' + e.degree + ' (' + e.period + ') ' + e.result));
+    (c.projects || []).forEach(p => { L.push('projects: ' + p.name + ' — ' + p.subtitle + ' [' + (p.tech || []).join(', ') + ']'); (p.points || []).forEach(pt => L.push('projects/' + p.name + ': ' + pt)); });
+    (c.skills || []).forEach(g => L.push('skills/' + g.cat + ': ' + (g.items || []).join(', ')));
+    (c.experience || []).forEach(x => L.push('experience: ' + x.role + ' @ ' + x.org + ' (' + x.period + ')'));
+    (c.achievements || []).forEach(a => L.push('achievements: ' + a.title + ' — ' + a.detail));
+    return L;
+  }
+
+  runCommand(raw) {
+    const s = this.state;
+    if (s.mode === 'password') {
+      this.push({ text: 'password: ' + '•'.repeat(raw.length), kind: 'dim' });
+      this.setState({ mode: 'normal' });
+      if (this.state.serverMode) {
+        this.apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ password: raw }) })
+          .then(j => {
+            if (j.otp) {
+              this.setState({ mode: 'otp' });
+              this.push({ text: 'a 6-digit code was sent to your email. it expires in 5 minutes.', kind: 'accent' });
+              return;
+            }
+            try { localStorage.setItem('pf_token', j.token); } catch (e) {}
+            this.setState({ token: j.token });
+            this.push({ text: 'access granted. welcome, root.', kind: 'accent' });
+            this.openApp('admin');
+          })
+          .catch(() => this.push({ text: 'access denied.', kind: 'err' }));
+      } else if (raw === this.pass) {
+        this.push({ text: 'access granted. welcome, root. (local mode)', kind: 'accent' });
+        this.openApp('admin');
+      } else {
+        this.push({ text: 'access denied.', kind: 'err' });
+      }
+      return;
+    }
+    if (s.mode === 'otp') {
+      this.push({ text: 'code: ' + raw.trim(), kind: 'dim' });
+      this.setState({ mode: 'normal' });
+      this.apiFetch('/auth/otp', { method: 'POST', body: JSON.stringify({ code: raw.trim() }) })
+        .then(j => {
+          try { localStorage.setItem('pf_token', j.token); } catch (e) {}
+          this.setState({ token: j.token });
+          this.push({ text: 'access granted. welcome, root.', kind: 'accent' });
+          this.openApp('admin');
+        })
+        .catch(() => this.push({ text: 'invalid or expired code — run sudo admin again.', kind: 'err' }));
+      return;
+    }
+    const prompt = s.mode === 'chat' ? 'ai> ' : 'guest@tanjim:~$ ';
+    this.push({ text: prompt + raw, kind: 'cmd' });
+    if (!raw.trim()) return;
+    if (s.mode === 'chat') {
+      if (raw.trim() === 'exit') { this.setState({ mode: 'normal' }); this.push({ text: 'left chat mode.', kind: 'dim' }); }
+      else this.askAI(raw.trim());
+      return;
+    }
+    const parts = raw.trim().split(/\s+/);
+    const cmd = parts[0].toLowerCase();
+    const arg = parts.slice(1).join(' ');
+    const secArg = arg.replace(/^\/+|\/+$/g, '').replace(/\.txt$/, '').toLowerCase();
+    switch (cmd) {
+      case 'help':
+        this.push([
+          { text: 'available commands:', kind: 'accent' },
+          { text: '  ls              list sections', kind: 'out' },
+          { text: '  cd <section>    open a section (cd about, cd /projects ...)', kind: 'out' },
+          { text: '  cat <file>      read a file (cat readme.md, cat about)', kind: 'out' },
+          { text: '  grep <term>     search the whole portfolio', kind: 'out' },
+          { text: '  ai [question]   one-shot answer · plain `ai` enters chat mode (exit to leave)', kind: 'out' },
+          { text: '  open <app>      open an app (terminal|finder|mail|settings|cv|music)', kind: 'out' },
+          { text: '  theme <name>    purple | green | cyan', kind: 'out' },
+          { text: '  neofetch · whoami · date · echo · history · clear · exit', kind: 'out' },
+          { text: '  setapi <url>    connect to your deployed backend', kind: 'dim' }
+        ]);
+        break;
+      case 'ls':
+        this.push([
+          { text: this.sections.map(x => x + '/').join('  '), kind: 'accent' },
+          { text: 'readme.md  cv.pdf', kind: 'out' }
+        ]);
+        break;
+      case 'cd':
+        if (!arg || secArg === '~' || secArg === '..') { this.setState({ section: null }); this.push({ text: '→ back to ~', kind: 'dim' }); }
+        else if (this.sections.includes(secArg)) { this.push({ text: '→ entering /' + secArg, kind: 'accent' }); this.setState({ section: secArg, lastSection: secArg }); }
+        else this.push({ text: 'cd: no such directory: ' + arg + '  (try: ' + this.sections.join(', ') + ')', kind: 'err' });
+        break;
+      case 'cat': {
+        const c = this.data();
+        if (secArg === 'readme' || secArg === 'readme.md') this.push([{ text: c.name, kind: 'accent' }, { text: c.tagline, kind: 'out' }]);
+        else if (secArg === 'cv' || secArg === 'cv.pdf') this.push({ text: 'cv.pdf: binary file — try `open cv`', kind: 'dim' });
+        else if (secArg === 'about') this.push({ text: c.about, kind: 'out' });
+        else if (this.sections.includes(secArg)) { this.push(this.flat().filter(l => l.startsWith(secArg)).map(t => ({ text: t, kind: 'out' }))); }
+        else this.push({ text: 'cat: ' + arg + ': no such file', kind: 'err' });
+        break;
+      }
+      case 'grep': {
+        if (!arg) { this.push({ text: 'usage: grep <term>', kind: 'dim' }); break; }
+        const hits = this.flat().filter(l => l.toLowerCase().includes(arg.toLowerCase()));
+        if (hits.length) this.push(hits.map(t => ({ text: t, kind: 'out' })).concat({ text: hits.length + ' match(es)', kind: 'dim' }));
+        else this.push({ text: 'grep: no matches for "' + arg + '"', kind: 'err' });
+        break;
+      }
+      case 'clear': this.setState({ termLines: [] }); break;
+      case 'whoami': this.push({ text: 'guest — a visitor exploring tanjim\'s portfolio', kind: 'out' }); break;
+      case 'date': this.push({ text: new Date().toString(), kind: 'out' }); break;
+      case 'echo': this.push({ text: arg, kind: 'out' }); break;
+      case 'history': this.push(this.state.history.map((h, i) => ({ text: '  ' + (i + 1) + '  ' + h, kind: 'out' }))); break;
+      case 'theme':
+        if (['purple', 'green', 'cyan'].includes(secArg)) { this.setTheme(secArg); this.push({ text: 'theme → ' + secArg, kind: 'accent' }); }
+        else this.push({ text: 'themes: purple | green | cyan', kind: 'dim' });
+        break;
+      case 'open':
+        if (['terminal', 'finder', 'mail', 'settings', 'cv', 'music'].includes(secArg)) { this.openApp(secArg); this.push({ text: 'opening ' + secArg + '…', kind: 'accent' }); }
+        else this.push({ text: 'open: unknown app: ' + arg, kind: 'err' });
+        break;
+      case 'neofetch': {
+        const c = this.data();
+        this.push([
+          { text: '  ▄▄▄▄▄▄   guest@tanjim-portfolio', kind: 'accent' },
+          { text: '  █ ◘ ◘ █  ─────────────────────', kind: 'accent' },
+          { text: '  █▄▄▄▄▄█  OS: tanjimOS ' + this.state.theme + ' edition', kind: 'out' },
+          { text: '   █ █ █   Host: ' + c.name, kind: 'out' },
+          { text: '           Shell: zsh (portfolio flavored)', kind: 'out' },
+          { text: '           CPU: Competitive Programming Unit @ 1317 CF', kind: 'out' },
+          { text: '           Uptime: coding since 2022', kind: 'out' }
+        ]);
+        break;
+      }
+      case 'sudo':
+        if (secArg === 'admin') { this.setState({ mode: 'password' }); this.push({ text: '[sudo] password for root:', kind: 'dim' }); }
+        else this.push({ text: 'guest is not in the sudoers file. this incident will be reported.', kind: 'err' });
+        break;
+      case 'setapi': {
+        const clean = arg.replace(/\/$/, '');
+        try { clean ? localStorage.setItem('pf_api', clean) : localStorage.removeItem('pf_api'); } catch (e) {}
+        this.setState({ apiBase: clean }, () => this.detectServer().then(() => this.push({ text: this.state.serverMode ? 'server connected ✓ — all data now live from backend' : 'no server found there — staying in local mode', kind: this.state.serverMode ? 'accent' : 'err' })));
+        this.push({ text: clean ? 'probing ' + clean + ' …' : 'api base cleared — probing same origin…', kind: 'dim' });
+        break;
+      }
+      case 'ai':
+      case 'chat':
+        if (arg) this.askAI(arg);
+        else { this.chatHist = []; this.setState({ mode: 'chat' }); this.push({ text: 'chat mode — ask anything about tanjim. type `exit` to leave.', kind: 'accent' }); }
+        break;
+      case 'exit':
+        this.closeApp('terminal'); break;
+      default:
+        this.push({ text: 'command not found: ' + cmd + ' — try `help`', kind: 'err' });
+    }
+  }
+
+  sysPrompt() {
+    return 'You are the terminal AI inside Md. Tanjimul Hasan\'s portfolio website. Answer visitor questions about Tanjim using ONLY the CV data below. STRICT RULES: never invent projects, jobs, dates, numbers, links or technologies that are not literally in the data; quote names and tech exactly as written; if the data does not contain the answer, say plainly that it is not in the portfolio and suggest the mail app. Be concise (2-4 sentences), friendly, slightly playful. CV DATA: ' + JSON.stringify(this.data());
+  }
+
+  startDots() {
+    let n = 1;
+    this.stopDots();
+    this.dotsTimer = setInterval(() => { n = n % 3 + 1; this.replaceLast('◆ thinking' + '.'.repeat(n), 'dim'); }, 350);
+  }
+  stopDots() { if (this.dotsTimer) { clearInterval(this.dotsTimer); this.dotsTimer = null; } }
+
+  async askAI(q) {
+    if (this.state.aiBusy) { this.push({ text: 'ai is still thinking — one sec…', kind: 'dim' }); return; }
+    this.setState({ aiBusy: true });
+    this.push({ text: '◆ thinking.', kind: 'dim' });
+    this.startDots();
+    const hist = (this.state.mode === 'chat' && this.chatHist) ? this.chatHist.slice(-8) : [];
+    const messages = [{ role: 'system', content: this.sysPrompt() }].concat(hist, [{ role: 'user', content: q }]);
+    try {
+      let answer;
+      if (this.state.serverMode) {
+        try { const j = await this.apiFetch('/ai', { method: 'POST', body: JSON.stringify({ question: q }) }); answer = j.answer; } catch (e) {}
+      }
+      if (!answer && this.state.groqKey) {
+        const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.state.groqKey },
+          body: JSON.stringify({ model: 'openai/gpt-oss-120b', temperature: 0.2, max_tokens: 400, messages })
+        });
+        if (!r.ok) throw new Error('groq http ' + r.status + (r.status === 401 ? ' — bad key? update it in admin' : ''));
+        const j = await r.json();
+        answer = j.choices[0].message.content;
+      }
+      if (!answer) {
+        if (!this.engine) {
+          this.stopDots();
+          this.replaceLast('◆ booting WebLLM in your browser (first time ~2GB download, be patient)…', 'dim');
+          const webllm = await import('https://esm.run/@mlc-ai/web-llm');
+          this.engine = await webllm.CreateMLCEngine('Llama-3.2-3B-Instruct-q4f16_1-MLC', {
+            initProgressCallback: p => { if (!this.dotsTimer) this.replaceLast('◆ ' + p.text, 'dim'); }
+          });
+          this.push({ text: '◆ thinking.', kind: 'dim' });
+          this.startDots();
+        }
+        const rep = await this.engine.chat.completions.create({ messages, temperature: 0.2, max_tokens: 350 });
+        answer = rep.choices[0].message.content;
+      }
+      this.stopDots();
+      if (this.state.mode === 'chat') {
+        this.chatHist = (this.chatHist || []).concat([{ role: 'user', content: q }, { role: 'assistant', content: answer }]);
+      }
+      this.replaceLast('◆ ' + answer.trim(), 'ai');
+    } catch (e) {
+      this.stopDots();
+      this.replaceLast('◆ ai error: ' + (e.message || e), 'err');
+    }
+    this.setState({ aiBusy: false });
+  }
+
+  onTermKey = e => {
+    if (e.key === 'Enter') {
+      const v = this.state.termInput;
+      this.setState(s => ({ termInput: '', history: v.trim() && s.mode === 'normal' ? s.history.concat(v) : s.history, histIdx: -1 }));
+      this.runCommand(v);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      this.setState(s => {
+        const idx = s.histIdx < 0 ? s.history.length - 1 : Math.max(0, s.histIdx - 1);
+        return s.history.length ? { histIdx: idx, termInput: s.history[idx] } : null;
+      });
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      this.setState(s => {
+        if (s.histIdx < 0) return null;
+        const idx = s.histIdx + 1;
+        return idx >= s.history.length ? { histIdx: -1, termInput: '' } : { histIdx: idx, termInput: s.history[idx] };
+      });
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      const v = this.state.termInput;
+      const m = v.match(/^(cd|cat)\s+(\S*)$/);
+      if (m) {
+        const hit = this.sections.find(x => x.startsWith(m[2].replace(/^\//, '')));
+        if (hit) this.setState({ termInput: m[1] + ' ' + hit });
+      } else {
+        const cmds = ['help', 'ls', 'cd ', 'cat ', 'grep ', 'ai ', 'open ', 'theme ', 'neofetch', 'whoami', 'clear', 'history', 'sudo admin'];
+        const hit = cmds.find(x => x.startsWith(v) && v);
+        if (hit) this.setState({ termInput: hit });
+      }
+    }
+  };
+
+  // ---------- theme / settings ----------
+  setTheme(t) { try { localStorage.setItem('pf_theme', t); } catch (e) {} this.setState({ theme: t }); }
+
+  // ---------- mail ----------
+  sendMail = () => {
+    const { mailFrom, mailSubject, mailBody } = this.state;
+    if (!mailFrom.includes('@') || !mailSubject.trim() || !mailBody.trim()) {
+      this.setState({ mailErr: 'fill in a valid email, subject and message first' }); return;
+    }
+    this.setState({ mailErr: '', mailState: 'sending' });
+    if (this.state.serverMode) {
+      this.apiFetch('/messages', { method: 'POST', body: JSON.stringify({ from: mailFrom, subject: mailSubject, body: mailBody }) })
+        .then(() => this.setState({ mailState: 'sent' }))
+        .catch(e => this.setState({ mailState: 'idle', mailErr: 'send failed: ' + (e.message || 'server unreachable') }));
+      return;
+    }
+    setTimeout(() => {
+      try {
+        const box = JSON.parse(localStorage.getItem('pf_inbox') || '[]');
+        box.unshift({ from: mailFrom, subject: mailSubject, body: mailBody, date: new Date().toLocaleString() });
+        localStorage.setItem('pf_inbox', JSON.stringify(box));
+      } catch (e) {}
+      this.setState({ mailState: 'sent' });
+    }, 900);
+  };
+
+  // ---------- music ----------
+  toggleMusic = () => {
+    if (this.state.musicOn) { this.stopMusic(); this.setState({ musicOn: false }); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    this.actx = new AC();
+    const master = this.actx.createGain(); master.gain.value = 0.05; master.connect(this.actx.destination);
+    const seq = [76, 79, 81, 79, 76, 74, 76, 0, 72, 74, 76, 74, 72, 69, 72, 0, 76, 79, 81, 84, 81, 79, 76, 0, 74, 76, 74, 72, 69, 67, 69, 0];
+    const bass = [40, 0, 45, 0, 40, 0, 45, 0];
+    let step = 0;
+    const f = m => 440 * Math.pow(2, (m - 69) / 12);
+    this.musicTimer = setInterval(() => {
+      const t = this.actx.currentTime;
+      const note = seq[step % seq.length], b = bass[step % bass.length];
+      [[note, 'square', 0.9], [b, 'triangle', 1.4]].forEach(([n, type, amp]) => {
+        if (!n) return;
+        const o = this.actx.createOscillator(), g = this.actx.createGain();
+        o.type = type; o.frequency.value = f(n);
+        g.gain.setValueAtTime(amp, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.16);
+      });
+      step++;
+    }, 170);
+    this.setState({ musicOn: true });
+  };
+  stopMusic() {
+    if (this.musicTimer) clearInterval(this.musicTimer);
+    if (this.actx) { try { this.actx.close(); } catch (e) {} this.actx = null; }
+  }
+
+  // ---------- admin ----------
+  syncAdmin(sec) {
+    const raw = this.data()[sec];
+    const val = raw === undefined ? '' : JSON.parse(JSON.stringify(raw));
+    this.setState({ adminSection: sec, adminDraft: val, adminJson: JSON.stringify(val, null, 2) });
+  }
+  setAdminMode = m => {
+    if (m === this.state.adminMode) return;
+    if (m === 'ui') {
+      try { this.setState({ adminMode: 'ui', adminDraft: JSON.parse(this.state.adminJson), adminMsg: '' }); }
+      catch (e) { this.setState({ adminMsg: 'fix the JSON before switching to UI' }); }
+    } else this.setState({ adminMode: 'code', adminJson: JSON.stringify(this.state.adminDraft, null, 2) });
+  };
+  uiSet(fn) { this.setState(s => ({ adminDraft: fn(JSON.parse(JSON.stringify(s.adminDraft))) })); }
+  adminSave = () => {
+    let val;
+    if (this.state.adminMode === 'code') {
+      try { val = JSON.parse(this.state.adminJson); }
+      catch (e) { this.setState({ adminMsg: 'invalid JSON: ' + e.message.slice(0, 40) }); return; }
+    } else val = this.state.adminDraft;
+    if (this.state.serverMode) {
+      this.apiFetch('/content', { method: 'PUT', body: JSON.stringify({ section: this.state.adminSection, value: val }) })
+        .then(j => this.setState({ serverContent: j.content, adminMsg: 'saved to server ✓', adminDraft: val, adminJson: JSON.stringify(val, null, 2) }))
+        .catch(e => this.setState({ adminMsg: 'save failed (' + e.message + ') — session expired? run sudo admin again' }));
+      setTimeout(() => this.setState({ adminMsg: '' }), 3000);
+      return;
+    }
+    const overrides = Object.assign({}, this.state.overrides || {}, { [this.state.adminSection]: val });
+    try { localStorage.setItem('pf_content', JSON.stringify(overrides)); } catch (e) {}
+    this.setState({ overrides, adminMsg: 'saved ✓', adminDraft: val, adminJson: JSON.stringify(val, null, 2) });
+    setTimeout(() => this.setState({ adminMsg: '' }), 2000);
+  };
+  adminResetAll = () => {
+    if (this.state.serverMode) {
+      this.apiFetch('/content/reset', { method: 'POST' })
+        .then(j => this.setState({ serverContent: j.content, adminMsg: 'server reset to CV defaults ✓' }, () => this.syncAdmin(this.state.adminSection)))
+        .catch(e => this.setState({ adminMsg: 'reset failed: ' + e.message }));
+      setTimeout(() => this.setState({ adminMsg: '' }), 3000);
+      return;
+    }
+    try { localStorage.removeItem('pf_content'); } catch (e) {}
+    this.setState({ overrides: null, adminMsg: 'reset to CV defaults ✓' }, () => this.syncAdmin(this.state.adminSection));
+    setTimeout(() => this.setState({ adminMsg: '' }), 2000);
+  };
+  onCvFile = e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) { this.setState({ cvMsg: 'file too big — keep it under 3 MB' }); return; }
+    const fr = new FileReader();
+    fr.onload = () => {
+      if (this.state.serverMode) {
+        this.apiFetch('/assets/cv', { method: 'POST', body: JSON.stringify({ dataUrl: fr.result }) })
+          .then(() => this.setState({ cvSrc: (this.state.apiBase || '') + '/api/assets/cv?t=' + Date.now(), cvMsg: 'cv updated on server ✓' }))
+          .catch(e => this.setState({ cvMsg: 'upload failed: ' + e.message }));
+        return;
+      }
+      try { localStorage.setItem('pf_cv', fr.result); this.setState({ cvSrc: fr.result, cvMsg: 'cv updated ✓' }); }
+      catch (err) { this.setState({ cvMsg: 'browser storage full — try a smaller pdf' }); }
+    };
+    fr.readAsDataURL(file);
+  };
+  cvReset = () => {
+    try { localStorage.removeItem('pf_cv'); } catch (e) {}
+    this.setState({ cvSrc: 'cv.pdf', cvMsg: 'restored default ✓' });
+  };
+  onAvatarFile = e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.size > 1.5 * 1024 * 1024) { this.setState({ avatarMsg: 'file too big — keep it under 1.5 MB' }); return; }
+    const fr = new FileReader();
+    fr.onload = () => {
+      if (this.state.serverMode) {
+        this.apiFetch('/assets/avatar', { method: 'POST', body: JSON.stringify({ dataUrl: fr.result }) })
+          .then(() => this.setState({ avatarSrc: (this.state.apiBase || '') + '/api/assets/avatar?t=' + Date.now(), avatarMsg: 'photo updated on server ✓' }))
+          .catch(e => this.setState({ avatarMsg: 'upload failed: ' + e.message }));
+        return;
+      }
+      try { localStorage.setItem('pf_avatar', fr.result); this.setState({ avatarSrc: fr.result, avatarMsg: 'photo updated ✓' }); }
+      catch (err) { this.setState({ avatarMsg: 'browser storage full — try a smaller image' }); }
+    };
+    fr.readAsDataURL(file);
+  };
+  avatarReset = () => {
+    try { localStorage.removeItem('pf_avatar'); } catch (e) {}
+    this.setState({ avatarSrc: 'avatar.png', avatarMsg: 'restored default ✓' });
+  };
+  changePass = () => {
+    const { passCurrent, passNew } = this.state;
+    if (this.state.serverMode) {
+      this.apiFetch('/auth/password', { method: 'POST', body: JSON.stringify({ current: passCurrent, next: passNew }) })
+        .then(() => {
+          try { localStorage.removeItem('pf_token'); } catch (e) {}
+          this.setState({ passMsg: 'password updated ✓ — run sudo admin to log in again', passCurrent: '', passNew: '', token: '' });
+        })
+        .catch(e => this.setState({ passMsg: 'failed (' + e.message + ') — check current password' }));
+      return;
+    }
+    if (passCurrent !== this.pass) { this.setState({ passMsg: 'current password is wrong' }); return; }
+    if (passNew.length < 6) { this.setState({ passMsg: 'new password too short (min 6)' }); return; }
+    this.pass = passNew;
+    try { localStorage.setItem('pf_admin', passNew); } catch (e) {}
+    this.setState({ passMsg: 'password updated ✓', passCurrent: '', passNew: '' });
+  };
+
+  refreshInbox() {
+    if (!this.state.serverMode) return;
+    this.apiFetch('/messages').then(j => this.setInbox(j.messages)).catch(() => {});
+  }
+  setInbox(list) {
+    this.setState({ serverInbox: (list || []).map((m, i) => ({ from: m.from, subject: m.subject, body: m.body, date: new Date(m.date).toLocaleString(), label: m.label && m.label !== 'UNCHECKED' ? m.label : null, labelBg: m.label === 'INQUIRY' ? 'var(--ac)' : '#ff7b72', idx: i })) });
+  }
+  deleteMsg = i => {
+    if (this.state.serverMode) {
+      this.apiFetch('/messages/' + i, { method: 'DELETE' }).then(j => this.setInbox(j.messages)).catch(() => {});
+    } else {
+      try {
+        const box = JSON.parse(localStorage.getItem('pf_inbox') || '[]');
+        box.splice(i, 1);
+        localStorage.setItem('pf_inbox', JSON.stringify(box));
+      } catch (e) {}
+      this.forceUpdate();
+    }
+  };
+  clearInbox = () => {
+    if (this.state.serverMode) {
+      this.apiFetch('/messages', { method: 'DELETE' }).then(j => this.setInbox(j.messages)).catch(() => {});
+    } else {
+      try { localStorage.setItem('pf_inbox', '[]'); } catch (e) {}
+      this.forceUpdate();
+    }
+  };
+
+  renderVals() {
+    const s = this.state;
+    const c = this.data();
+    const colorFor = { cmd: 'var(--text)', out: 'var(--text)', dim: 'var(--dim)', accent: 'var(--ac)', err: '#ff7b72', ai: 'var(--ac)' };
+    const isMobile = window.innerWidth < 768;
+    const dockDefs = [
+      { id: 'terminal', glyph: '>_', label: 'TERMINAL' },
+      { id: 'finder', glyph: '/·', label: 'SECTIONS' },
+      { id: 'mail', glyph: '@', label: 'MAIL' },
+      { id: 'settings', glyph: '✱', label: 'SETTINGS' },
+      { id: 'cv', glyph: 'CV', label: 'RESUME' },
+      { id: 'music', glyph: '♪', label: 'MUSIC' }
+    ];
+    const themes = [
+      { id: 'purple', label: 'PURPLE', swatch: 'linear-gradient(140deg,#b39dff,#7c5cff)', glow: 'rgba(124,92,255,.5)' },
+      { id: 'green', label: 'GREEN', swatch: 'linear-gradient(140deg,#6ee7a0,#22c55e)', glow: 'rgba(34,197,94,.5)' },
+      { id: 'cyan', label: 'CYAN', swatch: 'linear-gradient(140deg,#67e8f9,#06b6d4)', glow: 'rgba(6,182,212,.5)' }
+    ];
+    let inbox = [];
+    if (s.serverMode) inbox = s.serverInbox || [];
+    else {
+      try { inbox = JSON.parse(localStorage.getItem('pf_inbox') || '[]'); } catch (e) {}
+      inbox = inbox.map((m, i) => Object.assign({}, m, { idx: i }));
+    }
+    inbox = inbox.map(m => Object.assign({}, m, { remove: () => this.deleteMsg(m.idx) }));
+    const anyOpen = s.openApps.length > 0;
+    const draft = s.adminDraft;
+    const draftIsText = typeof draft === 'string';
+    const draftIsList = Array.isArray(draft);
+    const adminItems = draftIsList ? draft.map((item, i) => ({
+      title: (item && (item.name || item.school || item.role || item.title || item.cat || item.label)) || ('item ' + (i + 1)),
+      remove: () => this.uiSet(d => { d.splice(i, 1); return d; }),
+      fields: (item && typeof item === 'object') ? Object.keys(item).map(k => {
+        const wasArr = Array.isArray(item[k]);
+        const valStr = wasArr ? item[k].join('\n') : String(item[k] == null ? '' : item[k]);
+        const multi = wasArr || valStr.length > 70;
+        return {
+          label: k + (wasArr ? ' — one per line' : ''), value: valStr, multi, single: !multi,
+          onChange: e => { const v = e.target.value; this.uiSet(d => { d[i][k] = wasArr ? v.split('\n') : v; return d; }); }
+        };
+      }) : []
+    })) : [];
+    return {
+      theme: s.theme, crt: s.crt,
+      rootRef: this.rootRef, canvasRef: this.canvasRef, termBodyRef: this.termBodyRef, termInputRef: this.termInputRef,
+      c, socials: c.socials || [],
+      heroOp: anyOpen ? 0.15 : 1, heroBlur: anyOpen ? 'blur(3px)' : 'none',
+      dockItems: dockDefs.map(d => ({
+        ...d, open: s.openApps.includes(d.id), hovered: !isMobile && s.hoverDock === d.id,
+        click: () => this.openApp(d.id),
+        enter: () => this.setState({ hoverDock: d.id })
+      })),
+      dockLeave: () => this.setState({ hoverDock: null }),
+      w: this.winVals(),
+      isMobile,
+      heroRight: isMobile ? '6vw' : '7vw', heroLeft: isMobile ? '6vw' : 'auto',
+      heroAlign: isMobile ? 'center' : 'right', heroItems: isMobile ? 'center' : 'flex-end', heroJustify: isMobile ? 'center' : 'flex-end',
+      dockLeft: isMobile ? '50%' : '16px', dockTop: isMobile ? 'auto' : '50%', dockBottom: isMobile ? '12px' : 'auto',
+      dockTf: isMobile ? 'translateX(-50%)' : 'translateY(-50%)', dockDir: isMobile ? 'row' : 'column', dockBtnSize: isMobile ? '46px' : '52px',
+      dotLeft: isMobile ? '50%' : '-8px', dotTop: isMobile ? 'auto' : '50%', dotBottom: isMobile ? '-9px' : 'auto',
+      dotTf: isMobile ? 'translateX(-50%)' : 'translateY(-50%)',
+      secPadL: isMobile ? '6vw' : 'max(6vw, 120px)', secPadB: isMobile ? '120px' : '80px',
+      aboutCols: isMobile ? '1fr' : '1.6fr 1fr',
+      termFs: isMobile ? '16px' : '13px',
+      termChips: ['help', 'ls', 'cd projects', 'cd skills', 'ai', 'clear'].map(l => ({ label: l, click: () => this.runCommand(l) })),
+      termLines: s.termLines.map(l => ({ text: l.text, color: colorFor[l.kind] || 'var(--text)', weight: l.kind === 'cmd' ? '600' : '400' })),
+      termInput: s.termInput, termInputType: s.mode === 'password' ? 'password' : 'text',
+      promptLabel: s.mode === 'password' ? 'password:' : (s.mode === 'otp' ? 'code:' : (s.mode === 'chat' ? 'ai>' : 'guest@tanjim:~$')),
+      onTermChange: e => this.setState({ termInput: e.target.value }),
+      onTermKey: this.onTermKey, focusTerm: this.focusTerm,
+      finderItems: this.sections.map(x => ({ label: x.toUpperCase(), click: () => this.setState({ section: x, lastSection: x }) })),
+      openCvApp: () => this.openApp('cv'),
+      mailIdle: s.mailState !== 'sent', mailSent: s.mailState === 'sent',
+      mailFrom: s.mailFrom, mailSubject: s.mailSubject, mailBody: s.mailBody, mailErr: s.mailErr,
+      mailBtnLabel: s.mailState === 'sending' ? 'SENDING…' : 'SEND ▸',
+      onMailFrom: e => this.setState({ mailFrom: e.target.value }),
+      onMailSubject: e => this.setState({ mailSubject: e.target.value }),
+      onMailBody: e => this.setState({ mailBody: e.target.value }),
+      sendMail: this.sendMail,
+      mailAgain: () => this.setState({ mailState: 'idle', mailFrom: '', mailSubject: '', mailBody: '' }),
+      themeOptions: themes.map(t => ({
+        ...t, click: () => this.setTheme(t.id),
+        borderColor: s.theme === t.id ? 'var(--ac)' : 'var(--border)'
+      })),
+      toggleRain: () => this.setState(st => ({ rain: !st.rain })),
+      rainToggleBg: s.rain ? 'var(--ac2)' : 'var(--panel)',
+      rainKnobLeft: s.rain ? '23px' : '2px',
+      toggleCrt: () => this.setState(st => ({ crt: !st.crt })),
+      crtToggleBg: s.crt ? 'var(--ac2)' : 'var(--panel)',
+      crtKnobLeft: s.crt ? '23px' : '2px',
+      rainLevel: s.rainLevel,
+      onRainLevel: e => this.setState({ rainLevel: parseFloat(e.target.value) }),
+      groqKeyDraft: s.groqKeyDraft, groqStatus: s.groqStatus,
+      onGroqKey: e => this.setState({ groqKeyDraft: e.target.value }),
+      saveGroqKey: () => {
+        try { localStorage.setItem('pf_groq', s.groqKeyDraft); } catch (e) {}
+        this.setState({ groqKey: this.state.groqKeyDraft, groqStatus: this.state.groqKeyDraft ? 'groq key active ✓' : 'key cleared — WebLLM fallback' });
+      },
+      musicGlyph: s.musicOn ? '❚❚' : '▶', eqPlay: s.musicOn ? 'running' : 'paused',
+      toggleMusic: this.toggleMusic,
+      adminTabs: ['content', 'inbox', 'security', 'cv'].map(t => ({
+        label: t.toUpperCase(),
+        click: () => {
+          this.setState({ adminTab: t });
+          if (t === 'content') this.syncAdmin(this.state.adminSection);
+          if (t === 'inbox') this.refreshInbox();
+        },
+        border: s.adminTab === t ? 'var(--ac)' : 'var(--border)',
+        bg: s.adminTab === t ? 'var(--ac)' : 'transparent',
+        color: s.adminTab === t ? 'var(--bg)' : 'var(--dim)'
+      })),
+      adminOnContent: s.adminTab === 'content', adminOnInbox: s.adminTab === 'inbox', adminOnSecurity: s.adminTab === 'security', adminOnCv: s.adminTab === 'cv',
+      adminSection: s.adminSection, adminJson: s.adminJson, adminMsg: s.adminMsg,
+      adminModeUi: s.adminMode === 'ui', adminModeCode: s.adminMode === 'code',
+      modeUiClick: () => this.setAdminMode('ui'), modeCodeClick: () => this.setAdminMode('code'),
+      modeUiBg: s.adminMode === 'ui' ? 'var(--ac)' : 'transparent', modeUiColor: s.adminMode === 'ui' ? 'var(--bg)' : 'var(--dim)',
+      modeCodeBg: s.adminMode === 'code' ? 'var(--ac)' : 'transparent', modeCodeColor: s.adminMode === 'code' ? 'var(--bg)' : 'var(--dim)',
+      adminIsText: draftIsText, adminIsList: draftIsList, adminItems,
+      adminText: draftIsText ? draft : '',
+      onAdminText: e => this.setState({ adminDraft: e.target.value }),
+      adminAddItem: () => this.uiSet(d => { const proto = d[0] || {}; const it = {}; Object.keys(proto).forEach(k => { it[k] = Array.isArray(proto[k]) ? [] : ''; }); d.push(it); return d; }),
+      cvSrc: s.cvSrc, cvMsg: s.cvMsg, cvOpen: s.openApps.includes('cv'), cvLabel: s.cvSrc === 'cv.pdf' ? 'default (cv.pdf)' : 'custom upload',
+      onCvFile: this.onCvFile, cvReset: this.cvReset, cvIframeRef: this.cvIframeRef,
+      avatarSrc: s.avatarSrc, avatarMsg: s.avatarMsg, avatarReady: true, heroImgRef: this.heroImgRef, adminImgRef: this.adminImgRef,
+      onAvatarFile: this.onAvatarFile, avatarReset: this.avatarReset,
+      onAdminSection: e => this.syncAdmin(e.target.value),
+      onAdminJson: e => this.setState({ adminJson: e.target.value }),
+      adminSave: this.adminSave, adminResetAll: this.adminResetAll,
+      inbox, inboxEmpty: inbox.length === 0, inboxHasAny: inbox.length > 0, inboxClearAll: this.clearInbox, serverBadge: s.serverMode ? 'SERVER' : 'LOCAL',
+      passCurrent: s.passCurrent, passNew: s.passNew, passMsg: s.passMsg,
+      onPassCurrent: e => this.setState({ passCurrent: e.target.value }),
+      onPassNew: e => this.setState({ passNew: e.target.value }),
+      changePass: this.changePass,
+      sectionTY: s.section ? '0%' : '101%',
+      sectionName: s.section || s.lastSection,
+      closeSection: () => this.setState({ section: null }),
+      secAbout: s.section === 'about', secEducation: s.section === 'education', secProjects: s.section === 'projects',
+      secSkills: s.section === 'skills', secExperience: s.section === 'experience', secAchievements: s.section === 'achievements'
+    };
+  }
+}
+</script>
+</body>
+</html>
